@@ -1,0 +1,106 @@
+ body {
+            overflow-x: hidden; 
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh; 
+            width: 250px;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.active {
+            transform: translateX(250px); 
+        }
+
+        .content {
+            margin-right: 250px;
+            transition: margin-right 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(250px); 
+            }
+
+            .sidebar.active {
+                transform: translateX(0); 
+            }
+
+            .content {
+                margin-right: 0; 
+            }
+        }
+
+
+
+
+/* History page */
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 18px;
+    }
+
+    .table {
+        font-size: 14px;
+    }
+
+    .alert-info {
+        font-size: 14px;
+    }
+
+    .card-header h5 {
+        font-size: 16px;
+    }
+}
+
+
+/* dashboard page */
+     .modal-header .btn-close {
+        position: absolute;
+        left: 0;
+    }
+    .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+
+    .btn-success {
+        background-color: #198754;
+        border-color: #198754;
+    }
+
+    .table-success {
+        background-color: #d4edda;
+    }
+
+    .pagination-container .pagination {
+        display: flex;
+        justify-content: center;
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .pagination-container .pagination .page-item.active .page-link {
+        background-color: #198754;
+        border-color: #198754;
+        color: #fff;
+    }
+
+    .pagination-container .pagination .page-item .page-link {
+        color: #198754;
+        border-color: #ddd;
+    }
+
+    .pagination-container .pagination .page-item:hover .page-link {
+        background-color: #f1f1f1;
+    }
