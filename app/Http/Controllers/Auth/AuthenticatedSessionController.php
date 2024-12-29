@@ -17,6 +17,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
+//        dd("here1");
         return view('auth.login');
     }
 
@@ -25,13 +26,14 @@ class AuthenticatedSessionController extends Controller
      */
 
  public function store(LoginRequest $request): RedirectResponse
-    {   
+    {
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        if (Auth::attempt(['userId' => $request->userId, 'password' => $request->password])) {
             $request->session()->regenerate();
             return redirect()->intended(RouteServiceProvider::HOME);
         }
-
+        
+       
         return back()->withErrors([
             'email' => 'هذه البيانات لا تتطابق مع سجلاتنا.',
         ]);

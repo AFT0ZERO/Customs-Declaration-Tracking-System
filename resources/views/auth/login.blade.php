@@ -8,17 +8,18 @@
 
     <form method="POST" action="{{ route('login') }}" class="bg-white p-5 rounded shadow-lg">
         @csrf
+        {{-- @dd("here2") --}}
 
  <!-- Email Address -->
 <div class="mb-4">
-    <label for="email" class="form-label">{{ __('auth.email') }}</label>
-    <input id="email" 
-           class="form-control @error('email') is-invalid @enderror" 
-           type="text" 
-           name="email" 
-           value="{{ old('email') }}" 
+    <label for="userId" class="form-label">رقم المستخدم </label>
+    <input id="userId"
+           class="form-control @error('userId') is-invalid @enderror"
+           type="text"
+           name="userId"
+           value="{{ old('userId') }}"
            >
-    @error('email')
+    @error('userId')
         <div class="text-danger mt-2">{{ $message }}</div>
     @enderror
 </div>
