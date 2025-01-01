@@ -32,10 +32,11 @@ class AuthenticatedSessionController extends Controller
             $request->session()->regenerate();
             return redirect()->intended(RouteServiceProvider::HOME);
         }
-        
-       
+
+
         return back()->withErrors([
-            'email' => 'هذه البيانات لا تتطابق مع سجلاتنا.',
+            'userId' => 'هذه البيانات لا تتطابق مع سجلاتنا.',
+            'password' => 'هذه البيانات لا تتطابق مع سجلاتنا.',
         ]);
     }
 
