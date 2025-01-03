@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -17,7 +18,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Fuad',
                 'email' => "fuad@atcc.com.jo",
-                'userId' => 00236-1,
+                'userId' => "00236-1",
                 'email_verified_at' => now(),
                 'password' => Hash::make('5544220'), // password
                 'remember_token' => Str::random(10),
@@ -25,7 +26,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Mohammed O',
                 'email' => "fuad@atcc.com.jo",
-                'userId' => 00236-2,
+                'userId' => "00236-2",
                 'email_verified_at' => now(),
                 'password' => Hash::make('5544220'), // password
                 'remember_token' => Str::random(10),
@@ -33,7 +34,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Sohaib',
                 'email' => "fuad@atcc.com.jo",
-                'userId' => 00236-3,
+                'userId' => "00236-3",
                 'email_verified_at' => now(),
                 'password' => Hash::make('5544220'), // password
                 'remember_token' => Str::random(10),
@@ -41,7 +42,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Ghassan',
                 'email' => "fuad@atcc.com.jo",
-                'userId' => 00236-4,
+                'userId' => "00236-4",
                 'email_verified_at' => now(),
                 'password' => Hash::make('5544220'), // password
                 'remember_token' => Str::random(10),
@@ -49,7 +50,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Moatasem',
                 'email' => "fuad@atcc.com.jo",
-                'userId' => 00236-5,
+                'userId' => "00236-5",
                 'email_verified_at' => now(),
                 'password' => Hash::make('5544220'), // password
                 'remember_token' => Str::random(10),
@@ -57,7 +58,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Abdallah',
                 'email' => "fuad@atcc.com.jo",
-                'userId' => 00236-6,
+                'userId' => "00236-6",
                 'email_verified_at' => now(),
                 'password' => Hash::make('5544220'), // password
                 'remember_token' => Str::random(10),

@@ -151,7 +151,7 @@
                            @method('PUT')
                             <div class="form-group mb-3">
                                 <label for="edit-declaration-number">رقم البيان الجمركي</label>
-                                <input type="text" name="editNumber" value="" id="edit-declaration-number" class="form-control" readonly >
+                                <input type="text" name="editNumber" value="" id="edit-declaration-number" class="form-control"  >
                             </div>
                             <div class="form-group mb-3">
                                 <label for="edit-status">الحالة</label>

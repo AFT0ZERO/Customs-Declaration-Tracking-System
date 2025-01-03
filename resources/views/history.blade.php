@@ -26,7 +26,8 @@
                 </div>
 
                 <!-- History Table -->
-                <table class="table table-bordered table-striped">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped">
                     <thead class="table-success">
                         <tr>
                             <th>#</th>
@@ -54,6 +55,7 @@
                         @endforelse
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 
