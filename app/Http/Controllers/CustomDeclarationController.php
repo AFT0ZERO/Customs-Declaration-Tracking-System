@@ -9,18 +9,37 @@ use Illuminate\Http\Request;
 
 class CustomDeclarationController extends Controller
 {
-   public function index(Request $request)
+    public function index(Request $request)
     {
         $declaration_query = CustomDeclaration::query();
+
+        // Get the search parameter from the request
         $search_param = $request->query('search');
-        if(strlen($search_param)>17)
-        {
-            $search_param=substr($search_param,17);
+
+        // Trim the search parameter if it exceeds 17 characters
+        if (strlen($search_param) > 17) {
+            $search_param = substr($search_param, 17);
         }
-        if(!empty($search_param)){
-            $declaration_query=CustomDeclaration::search($search_param);
+
+        // Apply search logic if the search parameter is not empty
+        if (!empty($search_param)) {
+            if (strtotime($search_param)) {
+                // Convert the search parameter to a Carbon instance
+                $search_date = \Carbon\Carbon::parse($search_param)->startOfDay();
+
+                // Add a condition to search for records created on the specified date
+                $declaration_query->whereDate('created_at', $search_date);
+            }else{
+             $declaration_query->where(function ($query) use ($search_param) {
+                    $query->where('declaration_number', '=',  $search_param );
+             });
+            }
         }
-           $declarations = $declaration_query->paginate(50);
+
+        // Paginate the results
+        $declarations = $declaration_query->paginate(50);
+
+        // Return the view with the paginated results
         return view('dashboard', compact('declarations'));
     }
 
@@ -42,14 +61,17 @@ class CustomDeclarationController extends Controller
             'status' => $request->status,
         ]);
         $declaration = CustomDeclaration::where('declaration_number' , '=',$declaration_number)->first();
-     
+
         DeclarationHistory::create([
             'user_id' => auth()->id(),
             'declaration_id' => $declaration->id,
             'action' => "{$request->status}",
             'description'=> $request->description ?? 'لا يوجد'
         ]);
-
+        if ($declaration->status == "العقبة الارشيف")
+        {
+            $declaration->delete();
+        }
 
     return redirect()->back()->with('success', 'تم إضافة البيان الجمركي بنجاح!');
     }
