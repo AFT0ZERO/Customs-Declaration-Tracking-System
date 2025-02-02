@@ -57,6 +57,13 @@
                     </tr>
                 </thead>
                 <tbody>
+                 @if($declarations->items() == [])
+                        <div class="alert alert-danger alert-dismissible fade show" id="alert-show">
+                            لا يوجد بيانات مطابقة
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
                     @foreach($declarations as $declaration)
                     <tr>
                         <td>{{$loop->iteration}}</td>
@@ -193,7 +200,7 @@
             $('#alert-show').fadeOut('slow', function() {
                 $(this).remove();
             });
-        }, 2500);
+        }, 3000);
 
         // Set data to Edit Modal
         $('#editStatusModal').on('show.bs.modal', function (event) {
