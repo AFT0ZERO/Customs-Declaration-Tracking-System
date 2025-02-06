@@ -8,7 +8,8 @@
         <!-- Header Section -->
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
             <div>
-            <h1 class="text-center text-sm-start mb-4"> حركة البيانات الجمركية</h1>
+            <h2 class="text-center text-sm-start mb-4">اسم المستخدم :{{Auth::user()->name}} <br> حركة البيانات الجمركية </h2>
+
             <form method="GET" action="{{route('dashboard')}}" class="d-flex mt-3 mt-sm-0">
                 <input
                     type="text"
