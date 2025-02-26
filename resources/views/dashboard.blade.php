@@ -9,22 +9,21 @@
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
             <div>
             <h2 class="text-center text-sm-start mb-4">اسم المستخدم :{{Auth::user()->name}} <br> حركة البيانات الجمركية </h2>
-
+             <button class="btn btn-success mt-3 mt-sm-0 mb-3" data-bs-toggle="modal" data-bs-target="#addDeclarationModal">إضافة بيان جديد</button>
             <form method="GET" action="{{route('dashboard')}}" class="d-flex mt-3 mt-sm-0">
                 <input
                     type="text"
                     name="search"
-                    class="form-control me-2"
+                    class="form-control "
                     placeholder="بحث عن بيان..."
                     aria-label="Search..."
                 >
                 <button type="submit" class="btn btn-warning">بحث</button>
             </form>
+            </div>
                 <a href="{{route("declaration.showRestore")}}"style="color: white ;text-decoration:none ">
                     <button class="btn btn-danger mt-3 ">الارشيف</button>
                 </a>
-            </div>
-            <button class="btn btn-success mt-3 mt-sm-0" data-bs-toggle="modal" data-bs-target="#addDeclarationModal">إضافة بيان جديد</button>
         </div>
 
         @if(session('success'))
