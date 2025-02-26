@@ -137,9 +137,7 @@
                             <button type="submit" class="btn btn-success w-100">إضافة البيان</button>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -180,9 +178,7 @@
                             <button type="submit" class="btn btn-success w-100">تعديل الحالة</button>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -194,6 +190,14 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var modal = document.getElementById('addDeclarationModal');
+
+        modal.addEventListener('shown.bs.modal', function () {
+            document.getElementById('declaration_number').focus();
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
         // Close success alert after 3 seconds
         setTimeout(function() {
