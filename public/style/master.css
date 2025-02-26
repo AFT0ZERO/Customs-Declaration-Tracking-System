@@ -1,19 +1,26 @@
  body {
-            overflow-x: hidden; 
+            overflow-x: hidden;
         }
+
+ .custom-select {
+     -webkit-appearance: menulist !important;
+     -moz-appearance: menulist !important;
+     appearance: menulist-button !important;
+     background-image: none !important;
+ }
 
         .sidebar {
             position: fixed;
             top: 0;
             right: 0;
-            height: 100vh; 
+            height: 100vh;
             width: 250px;
             z-index: 1000;
             transition: transform 0.3s ease;
         }
 
         .sidebar.active {
-            transform: translateX(250px); 
+            transform: translateX(250px);
         }
 
         .content {
@@ -23,15 +30,15 @@
 
         @media (max-width: 768px) {
             .sidebar {
-                transform: translateX(250px); 
+                transform: translateX(250px);
             }
 
             .sidebar.active {
-                transform: translateX(0); 
+                transform: translateX(0);
             }
 
             .content {
-                margin-right: 0; 
+                margin-right: 0;
             }
         }
 

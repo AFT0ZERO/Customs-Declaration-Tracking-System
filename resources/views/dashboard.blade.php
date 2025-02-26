@@ -117,7 +117,7 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label for="status">  الحالة</label>
-                                <select name="status" id="status" class="form-control" required>
+                                <select name="status" id="status" class="form-control custom-select " required>
                                     <option value="عمان لغايات الفحص">عمان لغايات الفحص </option>
                                     <option value="عمان مراجعة زراعة">عمان مراجعة زراعة</option>
                                     <option value="عمان مراجعة مواصفات">عمان مراجعة مواصفات </option>
@@ -126,7 +126,6 @@
                                     <option value="العقبة مكتب 4">العقبة مكتب 4  </option>
                                     <option value="العقبة الارشيف">العقبة الارشيف</option>
                                     <option value="عمان">عمان</option>
-
                                 </select>
 
                             </div>
@@ -158,9 +157,9 @@
                                 <label for="edit-declaration-number">رقم البيان الجمركي</label>
                                 <input type="text" name="editNumber" value="" id="edit-declaration-number" class="form-control"  >
                             </div>
-                            <div class="form-group mb-3">
+                            <div class="form-group mb-3 ">
                                 <label for="edit-status">الحالة</label>
-                                <select name="status" id="edit-status" class="form-control" required>
+                                <select name="status" id="edit-status" class="form-control custom-select" required>
                                 <option value="عمان لغايات الفحص">عمان لغايات الفحص </option>
                                     <option value="عمان مراجعة زراعة">عمان مراجعة زراعة</option>
                                     <option value="عمان مراجعة مواصفات">عمان مراجعة مواصفات </option>
