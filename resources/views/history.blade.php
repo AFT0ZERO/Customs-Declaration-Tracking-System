@@ -9,9 +9,9 @@
         <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="text-success">سجل البيان الجمركي: <strong>{{ $declaration->declaration_number }}</strong></h1>
-            <a href="{{route("dashboard")}}"style="color: white ;text-decoration:none">
-            <button class="btn btn-success mt-3 mt-sm-0"> العوده</button>
-            </a>
+{{--            <a href="{{route("dashboard")}}"style="color: white ;text-decoration:none">--}}
+            <button class="btn btn-success mt-3 mt-sm-0" id="goBack"> العوده</button>
+{{--            </a>--}}
         </div>
 
         <!-- Card for Declaration Details -->

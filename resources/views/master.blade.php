@@ -69,6 +69,13 @@
         sidebar.classList.remove('active');
         closeSidebar.style.display = 'none';
     });
+
+// back button
+    let back = document.getElementById('goBack')
+    back.addEventListener('click',()=>{
+        window.history.back();
+    });
+
 </script>
 </body>
 </html>
