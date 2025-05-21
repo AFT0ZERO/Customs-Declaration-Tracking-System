@@ -10,19 +10,14 @@
                 <div>
                     <h1 class="text-center text-sm-start mb-4"> ارشيف البيانات الجمركية</h1>
                     <form method="GET" action="{{route('declaration.showRestore')}}" class="d-flex mt-3 mt-sm-0">
-                        <input
-                            type="text"
-                            name="search"
-                            class="form-control me-2"
-                            placeholder="بحث عن بيان..."
-                            aria-label="Search..."
-                        >
+                        <input type="text" name="search" class="form-control me-2" placeholder="بحث عن بيان..."
+                            aria-label="Search...">
                         <button type="submit" class="btn btn-warning">بحث</button>
                     </form>
                 </div>
-                    <a href="{{route("dashboard")}}"style="color: white ;text-decoration:none">
-                        <button class="btn btn-success mt-3 mt-sm-0"> العوده</button>
-                    </a>
+                <a href="{{route("dashboard")}}" style="color: white ;text-decoration:none">
+                    <button class="btn btn-success mt-3 mt-sm-0"> العوده</button>
+                </a>
             </div>
 
             @if(session('success'))
@@ -46,41 +41,45 @@
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
                     <thead class="table-success">
-                    <tr>
-                        <th>#</th>
-                        <th>رقم البيان الجمركي</th>
-                        <th>الحالة الحالية</th>
-                        <th>تاريخ الإضافة</th>
-                        <th>اخر تعديل</th>
-                        <th>العمليات</th>
-                    </tr>
+                        <tr>
+                            <th>#</th>
+                            <th>رقم البيان الجمركي</th>
+                            <th>الحالة الحالية</th>
+                            <th>تاريخ الإضافة</th>
+                            <th>اخر تعديل</th>
+                            <th>العمليات</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    @foreach($declarations as $declaration)
-                        <tr>
-                            <td>{{$loop->iteration}}</td>
-                            <td>{{ $declaration->declaration_number }}</td>
-                            <td>{{ $declaration->status }}</td>
-                            <td>{{ $declaration->created_at->format('d/m/Y')}}</td>
-                            <td>{{ $declaration->updated_at->format('d/m/Y')}}</td>
-                            <td>
-                                <a href="{{ route('declaration.showHistory', $declaration->id) }}" class="btn btn-warning text-white">
-                                    <i class="bi bi-clock"></i>
-                                </a>
-                                <a href="{{ route('declaration.restore', $declaration->id) }}" class="btn btn-success text-white">
-                                    ارجاع البيان
-                                </a>
+                        @foreach($declarations as $declaration)
+                            <tr>
+                                <td>{{$loop->iteration}}</td>
+                                <td>{{ $declaration->declaration_number }}</td>
+                                <td>{{ $declaration->status }}</td>
+                                <td>{{ $declaration->created_at->format('d/m/Y')}}</td>
+                                <td>{{ $declaration->updated_at->format('d/m/Y')}}</td>
+                                <td>
+                                    <a href="{{ route('declaration.showHistory', $declaration->id) }}"
+                                        class="btn btn-warning text-white">
+                                        <i class="bi bi-clock"></i>
+                                    </a>
+                                    <a href="{{ route('declaration.restore', $declaration->id) }}"
+                                        class="btn btn-success text-white">
+                                        ارجاع البيان
+                                    </a>
 
-                            </td>
-                        </tr>
-                    @endforeach
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
 
             <!-- Pagination -->
             <div class="d-flex justify-content-center mt-4">
-
+                <div class="pagination-container">
+                    {{ $declarations->links('pagination::bootstrap-4') }}
+                </div>
             </div>
 
         </div>

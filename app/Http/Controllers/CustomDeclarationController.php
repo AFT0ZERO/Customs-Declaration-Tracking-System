@@ -23,17 +23,17 @@ class CustomDeclarationController extends Controller
 
         // Apply search logic if the search parameter is not empty
         if (!empty($search_param)) {
-//            if (strtotime($search_param)) {
+            //            if (strtotime($search_param)) {
 //                // Convert the search parameter to a Carbon instance
 //                $search_date = \Carbon\Carbon::parse($search_param)->startOfDay();
 //
 //                // Add a condition to search for records created on the specified date
 //                $declaration_query->whereDate('created_at', $search_date);
 //            }else{
-             $declaration_query->where(function ($query) use ($search_param) {
-                    $query->where('declaration_number', '=',  $search_param );
-             });
-//            }
+            $declaration_query->where(function ($query) use ($search_param) {
+                $query->where('declaration_number', '=', $search_param);
+            });
+            //            }
         }
 
         // Paginate the results
@@ -51,75 +51,72 @@ class CustomDeclarationController extends Controller
             'status' => 'required',
         ]);
 
-        $declaration_number =$request->declaration_number;
-        if(strlen($declaration_number)>17)
-        {
-            $declaration_number=substr($declaration_number,17);
+        $declaration_number = $request->declaration_number;
+        if (strlen($declaration_number) > 17) {
+            $declaration_number = substr($declaration_number, 17);
         }
 
         CustomDeclaration::create([
             'declaration_number' => $declaration_number,
             'status' => $request->status,
         ]);
-        $declaration = CustomDeclaration::where('declaration_number' , '=',$declaration_number)->first();
+        $declaration = CustomDeclaration::where('declaration_number', '=', $declaration_number)->first();
 
         DeclarationHistory::create([
             'user_id' => auth()->id(),
             'declaration_id' => $declaration->id,
             'action' => "{$request->status}",
-            'description'=> $request->description ?? 'لا يوجد'
+            'description' => $request->description ?? 'لا يوجد'
         ]);
-        if ($declaration->status == "العقبة الارشيف")
-        {
+        if ($declaration->status == "العقبة الارشيف") {
             $declaration->delete();
         }
 
-    return redirect()->back()->with('success', 'تم إضافة البيان الجمركي بنجاح!');
+        return redirect()->back()->with('success', 'تم إضافة البيان الجمركي بنجاح!');
     }
 
- public function updateStatus(Request $request, $id) {
-    $declaration = CustomDeclaration::findOrFail($id);
-
-
-    if ($declaration->declaration_number !== $request->editNumber)
+    public function updateStatus(Request $request, $id)
     {
-        $declaration->declaration_number = $request->editNumber;
-        $declaration->save();
-    }
+        $declaration = CustomDeclaration::findOrFail($id);
 
-    if ($declaration->status !== $request->status) {
-        $oldStatus = $declaration->status;
-        $declaration->status = $request->status;
-        $declaration->save();
-        if ($request->status == 'العقبة الارشيف')
-        {
-            $declaration->delete();
+
+        if ($declaration->declaration_number !== $request->editNumber) {
+            $declaration->declaration_number = $request->editNumber;
+            $declaration->save();
         }
 
-        DeclarationHistory::create([
-            'user_id' => auth()->id(),
-            'declaration_id' => $declaration->id,
-            'action' => "$request->status ",
-            'description'=> $request->editDescription ?? 'لا يوجد'
-        ]);
+        if ($declaration->status !== $request->status) {
+            $oldStatus = $declaration->status;
+            $declaration->status = $request->status;
+            $declaration->save();
+            if ($request->status == 'العقبة الارشيف') {
+                $declaration->delete();
+            }
 
-        return redirect()->back()->with('success', 'تم تحديث الحالة بنجاح!');
+            DeclarationHistory::create([
+                'user_id' => auth()->id(),
+                'declaration_id' => $declaration->id,
+                'action' => "$request->status ",
+                'description' => $request->editDescription ?? 'لا يوجد'
+            ]);
+
+            return redirect()->back()->with('success', 'تم تحديث الحالة بنجاح!');
+        }
+
+        return redirect()->back()->with('info', 'لم يتم تغيير الحالة');
     }
 
-    return redirect()->back()->with('info', 'لم يتم تغيير الحالة');
-}
-
-   public function showHistory($id)
-{
-   $declaration = CustomDeclaration::withTrashed()->findOrFail($id);
-    $history = $declaration->histories()->orderBy('created_at', 'desc')->get();
+    public function showHistory($id)
+    {
+        $declaration = CustomDeclaration::withTrashed()->findOrFail($id);
+        $history = $declaration->histories()->orderBy('created_at', 'desc')->get();
         Carbon::setLocale('ar');
-    return view('history', compact('history', 'declaration'));
-}
+        return view('history', compact('history', 'declaration'));
+    }
 
 
 
-    public function restore( $id)
+    public function restore($id)
     {
         $declaration = CustomDeclaration::withTrashed()->find($id);
         $declaration->restore();
@@ -130,19 +127,24 @@ class CustomDeclarationController extends Controller
     public function showRestore(Request $request)
     {
         $query = $request->input('search');
-        if(strlen($query)>17)
-        {
-            $query=substr($query,17);
+
+        // Normalize the search query if it's too long
+        if ($query && strlen($query) > 17) {
+            $query = substr($query, 17);
         }
 
-        if ($query) {
-            $declarations = CustomDeclaration::onlyTrashed()
-                ->where('declaration_number', 'like', '%' . $query . '%')
-                ->paginate(50);
-        } else {
-            $declarations = CustomDeclaration::onlyTrashed()->paginate(50);
-        }
-        return view('restore', ['declarations' => $declarations]);
+        $declarations = CustomDeclaration::onlyTrashed()
+            ->when($query, function ($q) use ($query) {
+                return $q->where('declaration_number', $query);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(50)
+            ->appends($request->query());
+
+        return view('restore', [
+            'declarations' => $declarations,
+            'search' => $query
+        ]);
     }
 
 
