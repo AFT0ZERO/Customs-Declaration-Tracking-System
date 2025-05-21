@@ -11,16 +11,13 @@
                     <h2 class="text-center text-sm-start mb-4">اسم المستخدم :{{Auth::user()->name}} <br> حركة البيانات
                         الجمركية </h2>
                     <button class="btn btn-success mt-3 mt-sm-0 mb-3" data-bs-toggle="modal"
-                            data-bs-target="#addDeclarationModal">إضافة بيان جديد
+                        data-bs-target="#addDeclarationModal">إضافة بيان جديد
                     </button>
                     <form method="GET" action="{{route('dashboard')}}" class="d-flex mt-3 mt-sm-0">
-                        <input
-                            type="text"
-                            name="search"
-                            class="form-control "
-                            placeholder="بحث عن بيان..."
-                            aria-label="Search..."
-                        >
+                        <input type="text" name="search" class="form-control " placeholder="بحث عن بيان..."
+                            aria-label="Search..." value="{{ request('search') }}">
+                        <input type="hidden" name="sort" value="{{ request('sort', 'created_at') }}">
+                        <input type="hidden" name="direction" value="{{ request('direction', 'desc') }}">
                         <button type="submit" class="btn btn-warning">بحث</button>
                     </form>
                 </div>
@@ -50,48 +47,92 @@
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
                     <thead class="table-success">
-                    <tr>
-                        <th>#</th>
-                        <th>رقم البيان الجمركي</th>
-                        <th>الحالة الحالية</th>
-                        <th>تاريخ الإضافة</th>
-                        <th>اخر تعديل</th>
-                        <th>العمليات</th>
-                    </tr>
+                        <tr>
+                            <th>#</th>
+                            <th>
+                                رقم البيان الجمركي
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'declaration_number', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'declaration_number' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'declaration_number', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'declaration_number' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                الحالة الحالية
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'status' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'status' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                تاريخ الإضافة
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'created_at' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'created_at' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                اخر تعديل
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'updated_at', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'updated_at' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'updated_at', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'updated_at' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>العمليات</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    @if($declarations->items() == [])
-                        <div class="alert alert-danger alert-dismissible fade show" id="alert-show">
-                            لا يوجد بيانات مطابقة
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+                        @if($declarations->items() == [])
+                            <div class="alert alert-danger alert-dismissible fade show" id="alert-show">
+                                لا يوجد بيانات مطابقة
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
-                    @foreach($declarations as $declaration)
-                        <tr>
-                            <td>{{$loop->iteration}}</td>
-                            <td>{{ $declaration->declaration_number }}</td>
-                            <td>{{ $declaration->status }}</td>
-                            <td>{{ $declaration->created_at->format('d/m/Y')}}</td>
-                            <td>{{ $declaration->updated_at->format('d/m/Y')}}</td>
-                            <td>
-                                <a href="{{ route('declaration.showHistory', $declaration->id) }}"
-                                   class="btn btn-warning text-white" title="عرض حركات البيان">
-                                    <i class="bi bi-clock"></i>
-                                </a>
-                                <button class="btn btn-success"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editStatusModal"
-                                        data-id="{{ $declaration->id }}"
-                                        data-status="{{ $declaration->status }}"
+                        @foreach($declarations as $declaration)
+                            <tr>
+                                <td>{{$loop->iteration}}</td>
+                                <td>{{ $declaration->declaration_number }}</td>
+                                <td>{{ $declaration->status }}</td>
+                                <td>{{ $declaration->created_at->format('d/m/Y')}}</td>
+                                <td>{{ $declaration->updated_at->format('d/m/Y')}}</td>
+                                <td>
+                                    <a href="{{ route('declaration.showHistory', $declaration->id) }}"
+                                        class="btn btn-warning text-white" title="عرض حركات البيان">
+                                        <i class="bi bi-clock"></i>
+                                    </a>
+                                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editStatusModal"
+                                        data-id="{{ $declaration->id }}" data-status="{{ $declaration->status }}"
                                         data-number="{{ $declaration->declaration_number }}"
-                                        data-description="{{ $declaration->description }}"
-                                        title="تعديل على البيان ">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    @endforeach
+                                        data-description="{{ $declaration->description }}" title="تعديل على البيان ">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -105,7 +146,7 @@
 
             <!-- Add Declaration Modal -->
             <div class="modal fade" id="addDeclarationModal" tabindex="-1" role="dialog"
-                 aria-labelledby="addDeclarationModalLabel" aria-hidden="true">
+                aria-labelledby="addDeclarationModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -118,7 +159,7 @@
                                 <div class="form-group mb-3">
                                     <label for="declaration_number">رقم البيان الجمركي *</label>
                                     <input type="text" id="declaration_number" name="declaration_number"
-                                           class="form-control">
+                                        class="form-control">
 
                                 </div>
                                 <div class="form-group mb-3">
@@ -148,8 +189,8 @@
             </div>
 
             <!-- Edit Status Modal -->
-            <div class="modal fade" id="editStatusModal" tabindex="-1" role="dialog"
-                 aria-labelledby="editStatusModalLabel" aria-hidden="true">
+            <div class="modal fade" id="editStatusModal" tabindex="-1" role="dialog" aria-labelledby="editStatusModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -158,13 +199,13 @@
                         </div>
                         <div class="modal-body">
                             <form action="{{ route('declaration.updateStatus', ':id') }}" method="POST"
-                                  id="updateStatusForm">
+                                id="updateStatusForm">
                                 @csrf
                                 @method('PUT')
                                 <div class="form-group mb-3">
                                     <label for="edit-declaration-number">رقم البيان الجمركي</label>
                                     <input type="text" name="editNumber" value="" id="edit-declaration-number"
-                                           class="form-control">
+                                        class="form-control">
                                 </div>
                                 <div class="form-group mb-3 ">
                                     <label for="edit-status">الحالة</label>
@@ -181,8 +222,7 @@
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="edit-description">وصف إضافي</label>
-                                    <textarea name="editDescription" id="edit-description"
-                                              class="form-control"></textarea>
+                                    <textarea name="editDescription" id="edit-description" class="form-control"></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-success w-100">تعديل الحالة</button>
                             </form>

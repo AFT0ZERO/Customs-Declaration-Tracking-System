@@ -23,22 +23,30 @@ class CustomDeclarationController extends Controller
 
         // Apply search logic if the search parameter is not empty
         if (!empty($search_param)) {
-            //            if (strtotime($search_param)) {
-//                // Convert the search parameter to a Carbon instance
-//                $search_date = \Carbon\Carbon::parse($search_param)->startOfDay();
-//
-//                // Add a condition to search for records created on the specified date
-//                $declaration_query->whereDate('created_at', $search_date);
-//            }else{
             $declaration_query->where(function ($query) use ($search_param) {
                 $query->where('declaration_number', '=', $search_param);
             });
-            //            }
+        }
+
+        // Handle sorting
+        $sort = $request->query('sort', 'created_at');
+        $direction = $request->query('direction', 'desc');
+
+        // Validate sort column to prevent SQL injection
+        $allowedSortColumns = ['declaration_number', 'status', 'created_at', 'updated_at'];
+        if (!in_array($sort, $allowedSortColumns)) {
+            $sort = 'created_at';
+        }
+
+        // Apply sorting with proper type casting for declaration_number
+        if ($sort === 'declaration_number') {
+            $declaration_query->orderByRaw("CAST(declaration_number AS UNSIGNED) " . $direction);
+        } else {
+            $declaration_query->orderBy($sort, $direction);
         }
 
         // Paginate the results
         $declarations = $declaration_query->paginate(50);
-
 
         // Return the view with the paginated results
         return view('dashboard', ['declarations' => $declarations]);
