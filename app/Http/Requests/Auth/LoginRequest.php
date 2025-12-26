@@ -11,13 +11,13 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
- 
+
     public function authorize(): bool
     {
         return true;
     }
 
-  
+
     public function rules(): array
     {
         return [
@@ -30,8 +30,6 @@ class LoginRequest extends FormRequest
     {
         return [
             'userId.required' => 'يرجى إدخال رقم المستخدم.',
-            'email.required' => 'يرجى إدخال البريد الإلكتروني.',
-            'email.email' => 'يرجى إدخال بريد إلكتروني صالح.',
             'password.required' => 'يرجى إدخال كلمة المرور.',
         ];
     }
@@ -69,9 +67,9 @@ class LoginRequest extends FormRequest
         ]);
     }
 
- 
+
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
+        return Str::transliterate(Str::lower($this->string('userId')) . '|' . $this->ip());
     }
 }

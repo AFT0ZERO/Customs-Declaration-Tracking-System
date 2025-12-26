@@ -10,9 +10,12 @@ use Laravel\Scout\Searchable;
 class CustomDeclaration extends Model
 {
 
-    use HasFactory , Searchable ,SoftDeletes;
-protected $guarded ;
+    use HasFactory, Searchable, SoftDeletes;
+    protected $guarded;
 
+    protected $casts = [
+        'year' => 'integer',
+    ];
 
     public function histories()
     {
@@ -22,9 +25,9 @@ protected $guarded ;
     public function toSearchableArray()
     {
         return [
-            'declaration_number'=>$this->declaration_number,
-            'status'=>$this->status,
-            'created_at'=>$this->created_at,
+            'declaration_number' => $this->declaration_number,
+            'status' => $this->status,
+            'created_at' => $this->created_at,
         ];
     }
 }

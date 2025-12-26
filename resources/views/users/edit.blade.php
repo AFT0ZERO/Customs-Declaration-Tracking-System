@@ -39,7 +39,8 @@
                     <input type="password" name="password" class="form-control">
                 </div>
                 <div class="col-2 form-check">
-                    <input class="form-check-input border-secondary" type="checkbox" name="is_admin" value="1" id="is_admin" {{ old('is_admin', $user->is_admin) ? 'checked' : '' }}>
+                    <input class="form-check-input border-secondary" type="checkbox" name="is_admin" value="1" id="is_admin"
+                        {{ old('is_admin', $user->is_admin) ? 'checked' : '' }}>
                     <label class="form-check-label" for="is_admin">منح صلاحية المدير</label>
                 </div>
                 <div class="col-12">

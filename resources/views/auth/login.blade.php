@@ -8,9 +8,8 @@
 
     <form method="POST" action="{{ route('login') }}" class="bg-white p-5 rounded shadow-lg">
         @csrf
-        {{-- @dd("here2") --}}
 
-        <!-- Email Address -->
+        <!-- User ID -->
         <div class="mb-4">
             <label for="userId" class="form-label">رقم المستخدم </label>
             <input id="userId" class="form-control @error('userId') is-invalid @enderror" type="text" name="userId"

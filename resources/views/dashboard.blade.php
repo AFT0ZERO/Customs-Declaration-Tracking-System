@@ -50,7 +50,7 @@
                         <tr>
                             <th>#</th>
                             <th>
-                                رقم البيان الجمركي
+                                رقم البيان
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'declaration_number', 'direction' => 'asc']) }}"
                                         class="btn btn-sm {{ request('sort') === 'declaration_number' && request('direction') === 'asc' ? 'btn-success' : '' }}">
@@ -58,6 +58,19 @@
                                     </a>
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'declaration_number', 'direction' => 'desc']) }}"
                                         class="btn btn-sm {{ request('sort') === 'declaration_number' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                مركز البيان
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'declaration_type', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'declaration_type' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'declaration_type', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'declaration_type' && request('direction') === 'desc' ? 'btn-success' : '' }}">
                                         <i class="bi bi-arrow-down"></i>
                                     </a>
                                 </div>
@@ -116,6 +129,7 @@
                             <tr>
                                 <td>{{$loop->iteration}}</td>
                                 <td>{{ $declaration->declaration_number }}</td>
+                                <td>{{ $declaration->declaration_type }}</td>
                                 <td>{{ $declaration->status }}</td>
                                 <td>{{ $declaration->created_at->format('d/m/Y')}}</td>
                                 <td>{{ $declaration->updated_at->format('d/m/Y')}}</td>
@@ -127,6 +141,7 @@
                                     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editStatusModal"
                                         data-id="{{ $declaration->id }}" data-status="{{ $declaration->status }}"
                                         data-number="{{ $declaration->declaration_number }}"
+                                        data-type="{{ $declaration->declaration_type }}" data-year="{{ $declaration->year }}"
                                         data-description="{{ $declaration->description }}" title="تعديل على البيان ">
                                         <i class="bi bi-pencil"></i>
                                     </button>
@@ -150,24 +165,47 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="addDeclarationModalLabel">إضافة بيان جمركي جديد</h5>
+                            <h5 class="modal-title" id="addDeclarationModalLabel">إضافة بيان جديد</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <form action="{{ route('declaration.store') }}" method="POST">
                                 @csrf
                                 <div class="form-group mb-3">
-                                    <label for="declaration_number">رقم البيان الجمركي *</label>
+                                    <label for="declaration_number">رقم البيان *</label>
                                     <input type="text" id="declaration_number" name="declaration_number"
                                         class="form-control">
 
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="declaration_type">مركز البيان </label>
+                                            <select name="declaration_type" id="declaration_type"
+                                                class="form-control custom-select" required>
+                                                <option value="">اختر المركز</option>
+                                                <option value="220">220</option>
+                                                <option value="224">224</option>
+                                                <option value="900">900</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="year">السنة</label>
+                                            <select name="year" id="year" class="form-control custom-select" required>
+                                                <option value="">اختر السنة</option>
+                                                <option value="2025">2025</option>
+                                                <option value="2026">2026</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="status"> الحالة</label>
                                     <select name="status" id="status" class="form-control custom-select " required>
                                         <option value="عمان لغايات الفحص">عمان لغايات الفحص</option>
-                                        <option value="عمان مراجعة زراعة">عمان مراجعة زراعة</option>
-                                        <option value="عمان مراجعة مواصفات">عمان مراجعة مواصفات</option>
                                         <option value="العقبة ساحة 4 غذاء">العقبة ساحة 4 غذاء</option>
                                         <option value="العقبة غذاء البلد">العقبة غذاء البلد</option>
                                         <option value="العقبة مكتب 4">العقبة مكتب 4</option>
@@ -203,16 +241,37 @@
                                 @csrf
                                 @method('PUT')
                                 <div class="form-group mb-3">
-                                    <label for="edit-declaration-number">رقم البيان الجمركي</label>
+                                    <label for="edit-declaration-number">رقم البيان </label>
                                     <input type="text" name="editNumber" value="" id="edit-declaration-number"
                                         class="form-control">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="edit-declaration-type">مركز البيان </label>
+                                            <select name="declaration_type" id="edit-declaration-type"
+                                                class="form-control custom-select" required>
+                                                <option value="220">220</option>
+                                                <option value="224">224</option>
+                                                <option value="900">900</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="edit-year">السنة</label>
+                                            <select name="year" id="edit-year" class="form-control custom-select" required>
+                                                <option value="2025">2025</option>
+                                                <option value="2026">2026</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="form-group mb-3 ">
                                     <label for="edit-status">الحالة</label>
                                     <select name="status" id="edit-status" class="form-control custom-select" required>
                                         <option value="عمان لغايات الفحص">عمان لغايات الفحص</option>
-                                        <option value="عمان مراجعة زراعة">عمان مراجعة زراعة</option>
-                                        <option value="عمان مراجعة مواصفات">عمان مراجعة مواصفات</option>
                                         <option value="العقبة ساحة 4 غذاء">العقبة ساحة 4 غذاء</option>
                                         <option value="العقبة غذاء البلد">العقبة غذاء البلد</option>
                                         <option value="العقبة مكتب 4">العقبة مكتب 4</option>
@@ -256,20 +315,37 @@
             }, 3000);
 
             // Set data to Edit Modal
-            $('#editStatusModal').on('show.bs.modal', function (event) {
+            $('#editStatusModal').on('shown.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
                 var declarationId = button.data('id');
                 var declarationStatus = button.data('status');
                 var declarationNumber = button.data('number');
+                var declarationType = button.data('type');
+                var declarationYear = button.data('year');
                 var declarationDescription = button.data('description');
                 var actionUrl = "{{ route('declaration.updateStatus', ':id') }}";
                 actionUrl = actionUrl.replace(':id', declarationId);
+
+                // Convert to string to ensure proper matching with select option values
+                declarationType = String(declarationType || '').trim();
+                declarationYear = String(declarationYear || '').trim();
 
                 // Set form action and field values
                 $('#updateStatusForm').attr('action', actionUrl);
                 $('#edit-status').val(declarationStatus);
                 $('#edit-declaration-number').val(declarationNumber);
 
+                // Set select values - ensure they match option values exactly
+                // Use setTimeout to ensure DOM is ready
+                setTimeout(function () {
+                    $('#edit-declaration-type').val(declarationType);
+                    $('#edit-year').val(declarationYear);
+                }, 10);
+
+                // Set description if exists
+                if (declarationDescription) {
+                    $('#edit-description').val(declarationDescription);
+                }
             });
         });
 

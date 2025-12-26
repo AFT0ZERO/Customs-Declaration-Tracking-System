@@ -25,7 +25,7 @@ class AuthenticatedSessionController extends Controller
      * Handle an incoming authentication request.
      */
 
- public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request): RedirectResponse
     {
 
         if (Auth::attempt(['userId' => $request->userId, 'password' => $request->password])) {
@@ -35,8 +35,8 @@ class AuthenticatedSessionController extends Controller
 
 
         return back()->withErrors([
-            'userId' => 'هذه البيانات لا تتطابق مع سجلاتنا.',
-            'password' => 'هذه البيانات لا تتطابق مع سجلاتنا.',
+            'userId' => 'هذه البيانات غير صحيحة  .',
+            'password' => 'هذه البيانات غير صحيحة .',
         ]);
     }
 

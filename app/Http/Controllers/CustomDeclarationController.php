@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCustomDeclarationRequest;
+use App\Http\Requests\UpdateCustomDeclarationRequest;
 use App\Models\CustomDeclaration;
 use App\Models\DeclarationHistory;
 use Carbon\Carbon;
@@ -33,7 +35,7 @@ class CustomDeclarationController extends Controller
         $direction = $request->query('direction', 'desc');
 
         // Validate sort column to prevent SQL injection
-        $allowedSortColumns = ['declaration_number', 'status', 'created_at', 'updated_at'];
+        $allowedSortColumns = ['declaration_number', 'declaration_type', 'status', 'created_at', 'updated_at'];
         if (!in_array($sort, $allowedSortColumns)) {
             $sort = 'created_at';
         }
@@ -52,23 +54,19 @@ class CustomDeclarationController extends Controller
         return view('dashboard', ['declarations' => $declarations]);
     }
 
-    public function store(Request $request)
+    public function store(StoreCustomDeclarationRequest $request)
     {
-        $request->validate([
-            'declaration_number' => 'required|unique:custom_declarations',
-            'status' => 'required',
-        ]);
-
         $declaration_number = $request->declaration_number;
         if (strlen($declaration_number) > 17) {
             $declaration_number = substr($declaration_number, 17);
         }
 
-        CustomDeclaration::create([
+        $declaration = CustomDeclaration::create([
             'declaration_number' => $declaration_number,
+            'declaration_type' => $request->declaration_type,
+            'year' => $request->year,
             'status' => $request->status,
         ]);
-        $declaration = CustomDeclaration::where('declaration_number', '=', $declaration_number)->first();
 
         DeclarationHistory::create([
             'user_id' => auth()->id(),
@@ -76,6 +74,7 @@ class CustomDeclarationController extends Controller
             'action' => "{$request->status}",
             'description' => $request->description ?? 'لا يوجد'
         ]);
+
         if ($declaration->status == "العقبة الارشيف") {
             $declaration->delete();
         }
@@ -83,20 +82,31 @@ class CustomDeclarationController extends Controller
         return redirect()->back()->with('success', 'تم إضافة البيان الجمركي بنجاح!');
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(UpdateCustomDeclarationRequest $request, $id)
     {
         $declaration = CustomDeclaration::findOrFail($id);
 
+        $hasChanges = false;
 
         if ($declaration->declaration_number !== $request->editNumber) {
             $declaration->declaration_number = $request->editNumber;
-            $declaration->save();
+            $hasChanges = true;
+        }
+
+        if ($declaration->declaration_type !== $request->declaration_type) {
+            $declaration->declaration_type = $request->declaration_type;
+            $hasChanges = true;
+        }
+
+        if ($declaration->year != $request->year) {
+            $declaration->year = $request->year;
+            $hasChanges = true;
         }
 
         if ($declaration->status !== $request->status) {
-            $oldStatus = $declaration->status;
             $declaration->status = $request->status;
-            $declaration->save();
+            $hasChanges = true;
+
             if ($request->status == 'العقبة الارشيف') {
                 $declaration->delete();
             }
@@ -107,7 +117,10 @@ class CustomDeclarationController extends Controller
                 'action' => "$request->status ",
                 'description' => $request->editDescription ?? 'لا يوجد'
             ]);
+        }
 
+        if ($hasChanges) {
+            $declaration->save();
             return redirect()->back()->with('success', 'تم تحديث الحالة بنجاح!');
         }
 
