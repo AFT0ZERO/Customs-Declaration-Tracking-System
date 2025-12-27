@@ -183,7 +183,6 @@
                                             <label for="declaration_type">مركز البيان </label>
                                             <select name="declaration_type" id="declaration_type"
                                                 class="form-control custom-select" required>
-                                                <option value="">اختر المركز</option>
                                                 <option value="220">220</option>
                                                 <option value="224">224</option>
                                                 <option value="900">900</option>
@@ -195,7 +194,6 @@
                                         <div class="form-group mb-3">
                                             <label for="year">السنة</label>
                                             <select name="year" id="year" class="form-control custom-select" required>
-                                                <option value="">اختر السنة</option>
                                                 <option value="2025">2025</option>
                                                 <option value="2026">2026</option>
                                             </select>
