@@ -44,6 +44,8 @@
                         <tr>
                             <th>#</th>
                             <th>رقم البيان الجمركي</th>
+                            <th>مركز البيان</th>
+                            <th>السنة</th>
                             <th>الحالة الحالية</th>
                             <th>تاريخ الإضافة</th>
                             <th>اخر تعديل</th>
@@ -55,6 +57,8 @@
                             <tr>
                                 <td>{{$loop->iteration}}</td>
                                 <td>{{ $declaration->declaration_number }}</td>
+                                <td>{{ $declaration->declaration_type }}</td>
+                                <td>{{ $declaration->year }}</td>
                                 <td>{{ $declaration->status }}</td>
                                 <td>{{ $declaration->created_at->format('d/m/Y')}}</td>
                                 <td>{{ $declaration->updated_at->format('d/m/Y')}}</td>

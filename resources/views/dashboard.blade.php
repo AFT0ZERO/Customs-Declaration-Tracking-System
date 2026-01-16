@@ -76,6 +76,19 @@
                                 </div>
                             </th>
                             <th>
+                                سنة
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'year', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'year' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'year', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'year' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
                                 الحالة الحالية
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => 'asc']) }}"
@@ -130,6 +143,7 @@
                                 <td>{{$loop->iteration}}</td>
                                 <td>{{ $declaration->declaration_number }}</td>
                                 <td>{{ $declaration->declaration_type }}</td>
+                                <td>{{ $declaration->year }}</td>
                                 <td>{{ $declaration->status }}</td>
                                 <td>{{ $declaration->created_at->format('d/m/Y')}}</td>
                                 <td>{{ $declaration->updated_at->format('d/m/Y')}}</td>
@@ -194,8 +208,8 @@
                                         <div class="form-group mb-3">
                                             <label for="year">السنة</label>
                                             <select name="year" id="year" class="form-control custom-select" required>
-                                                <option value="2025">2025</option>
                                                 <option value="2026">2026</option>
+                                                <option value="2025">2025</option>
                                             </select>
                                         </div>
                                     </div>
@@ -260,8 +274,8 @@
                                         <div class="form-group mb-3">
                                             <label for="edit-year">السنة</label>
                                             <select name="year" id="edit-year" class="form-control custom-select" required>
-                                                <option value="2025">2025</option>
                                                 <option value="2026">2026</option>
+                                                <option value="2025">2025</option>
                                             </select>
                                         </div>
                                     </div>
