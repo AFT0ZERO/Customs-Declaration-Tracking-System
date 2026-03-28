@@ -222,6 +222,7 @@
                                         <option value="العقبة غذاء البلد">العقبة غذاء البلد</option>
                                         <option value="العقبة مكتب 4">العقبة مكتب 4</option>
                                         <option value="العقبة الارشيف">العقبة الارشيف</option>
+                                        <option value="عمان التاجر">عمان التاجر</option>
                                         <option value="عمان">عمان</option>
                                     </select>
 
@@ -288,6 +289,7 @@
                                         <option value="العقبة غذاء البلد">العقبة غذاء البلد</option>
                                         <option value="العقبة مكتب 4">العقبة مكتب 4</option>
                                         <option value="العقبة الارشيف">العقبة الارشيف</option>
+                                        <option value="عمان التاجر">عمان التاجر</option>
                                         <option value="عمان">عمان</option>
                                     </select>
                                 </div>
