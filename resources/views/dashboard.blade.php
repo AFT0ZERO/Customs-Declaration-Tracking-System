@@ -13,7 +13,7 @@
                     <button class="btn btn-success mt-3 mt-sm-0 mb-3" data-bs-toggle="modal"
                         data-bs-target="#addDeclarationModal">إضافة بيان جديد
                     </button>
-                    <form method="GET" action="{{route('dashboard')}}" class="d-flex mt-3 mt-sm-0">
+                    <form method="GET" action="{{route('dashboard')}}" class="d-flex mt-3 mt-sm-0 gap-2">
                         <input type="text" name="search" class="form-control " placeholder="بحث عن بيان..."
                             aria-label="Search..." value="{{ request('search') }}">
                         <input type="hidden" name="sort" value="{{ request('sort', 'created_at') }}">
