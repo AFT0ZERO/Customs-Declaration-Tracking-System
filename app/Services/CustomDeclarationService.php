@@ -16,6 +16,24 @@ class CustomDeclarationService
         private readonly CustomDeclarationRepository $repository
     ) {}
 
+    private function normalizeDeclarationNumber(?string $declarationNumber): string | null
+    {
+        if (strlen($declarationNumber) > 17) {
+            $res = "";
+            $declarationNumber = substr($declarationNumber, 17);
+            
+            for ($i = 0; $i < strlen($declarationNumber); ++$i) {
+            if ($declarationNumber[$i] == '0') {
+                continue;
+            }
+            $res .= $declarationNumber[$i];
+        }
+        
+        return $res;
+        }
+        
+        return $declarationNumber;
+    }
     // ──────────────────────────────────────────────────────────────────────────
     //  index
     // ──────────────────────────────────────────────────────────────────────────
@@ -33,10 +51,8 @@ class CustomDeclarationService
     ): LengthAwarePaginator {
         // Normalise the search term
         $search = $searchInput;
-        if ($search !== null && strlen($search) > 17) {
-            $search = substr($search, 17);
-        }
-
+        $search = $this->normalizeDeclarationNumber($search);
+        
         // Whitelist sort column to prevent SQL injection
         $allowedSortColumns = ['declaration_number', 'declaration_type', 'status', 'created_at', 'updated_at'];
         if (!in_array($sort, $allowedSortColumns)) {
@@ -59,9 +75,7 @@ class CustomDeclarationService
     {
         // Normalise the declaration number
         $declarationNumber = $request->declaration_number;
-        if (strlen($declarationNumber) > 17) {
-            $declarationNumber = substr($declarationNumber, 17);
-        }
+        $declarationNumber = $this->normalizeDeclarationNumber($declarationNumber);
 
         // Persist the declaration
         $declaration = $this->repository->create([
@@ -177,9 +191,7 @@ class CustomDeclarationService
     public function getTrashedDeclarations(?string $searchInput, array $queryParams = []): array
     {
         $search = $searchInput;
-        if ($search && strlen($search) > 17) {
-            $search = substr($search, 17);
-        }
+        $search = $this->normalizeDeclarationNumber($search);
 
         $declarations = $this->repository->paginateTrashed($search, $queryParams);
 

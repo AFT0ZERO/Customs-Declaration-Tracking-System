@@ -21,9 +21,6 @@
                         <button type="submit" class="btn btn-warning">بحث</button>
                     </form>
                 </div>
-                <a href="{{route("declaration.showRestore")}}" style="color: white ;text-decoration:none ">
-                    <button class="btn btn-danger mt-3 ">الارشيف</button>
-                </a>
             </div>
 
             @if(session('success'))

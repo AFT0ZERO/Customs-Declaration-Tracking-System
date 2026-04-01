@@ -27,16 +27,19 @@
                         <i class="fas fa-times"></i>
                     </button>
                     <h4 class="text-center w-100 mb-4">لوحة التحكم</h4>
-                    <a href="{{ route('dashboard') }}" class="btn btn-dark w-100 text-end py-2 active">
+                    <a href="{{ route('dashboard') }}" class="btn btn-dark w-100 text-end py-2 {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="fas fa-tachometer-alt"></i> الصفحة الرئيسية
                     </a>
                     @auth
                         @if(Auth::user()->is_admin)
-                            <a href="{{ route('users.index') }}" class="btn btn-dark w-100 text-end py-2">
+                            <a href="{{ route('users.index') }}" class="btn btn-dark w-100 text-end py-2 {{ request()->routeIs('users.*') ? 'active' : '' }}">
                                 <i class="fas fa-users"></i> المستخدمون
                             </a>
                         @endif
                     @endauth
+                    <a href="{{route("declaration.showRestore")}}" class="btn btn-dark w-100 text-end py-2 {{ request()->routeIs('declaration.showRestore') ? 'active' : '' }}">
+                    <i class="fas fa-archive"></i> الارشيف
+                </a>
                     <a href="#" class="btn btn-dark w-100 text-end py-2"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="fas fa-sign-out-alt"></i> تسجيل الخروج

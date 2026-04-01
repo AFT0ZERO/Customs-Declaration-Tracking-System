@@ -32,13 +32,12 @@ class CustomDeclarationRepository
         if (!empty($search)) {
             $query->where('declaration_number', '=', $search);
         }
-
         if ($sort === 'declaration_number') {
             $query->orderByRaw("CAST(declaration_number AS UNSIGNED) " . $direction);
         } else {
             $query->orderBy($sort, $direction);
         }
-
+        
         return $query->paginate($perPage);
     }
 
