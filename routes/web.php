@@ -20,9 +20,13 @@ Route::get('/declaration/history/{id}', [CustomDeclarationController::class, 'sh
 Route::get('declaration/restore', [CustomDeclarationController::class, "showRestore"])->name("declaration.showRestore");
 Route::get('dashboard/restore/{id}', [CustomDeclarationController::class, "restore"])->name("declaration.restore");
 
+
+
 // Users CRUD (admin only)
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::resource('users', UserController::class)->except(['show']);
+    Route::get('/analytics', [CustomDeclarationController::class, 'showAnalytics'])
+    ->name('analytics');
 });
 
 require __DIR__ . '/auth.php';

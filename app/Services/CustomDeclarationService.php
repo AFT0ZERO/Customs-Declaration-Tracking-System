@@ -54,7 +54,7 @@ class CustomDeclarationService
         $search = $this->normalizeDeclarationNumber($search);
         
         // Whitelist sort column to prevent SQL injection
-        $allowedSortColumns = ['declaration_number', 'declaration_type', 'status', 'created_at', 'updated_at'];
+        $allowedSortColumns = ['declaration_number', 'declaration_type', 'status', 'created_at', 'updated_at', 'year'];
         if (!in_array($sort, $allowedSortColumns)) {
             $sort = 'created_at';
         }
@@ -188,12 +188,21 @@ class CustomDeclarationService
      *
      * @return array{declarations: LengthAwarePaginator, search: string|null}
      */
-    public function getTrashedDeclarations(?string $searchInput, array $queryParams = []): array
-    {
+    public function getTrashedDeclarations(
+        ?string $searchInput,
+        string  $sort      = 'created_at',
+        string  $direction = 'desc'
+    ): array {
         $search = $searchInput;
         $search = $this->normalizeDeclarationNumber($search);
 
-        $declarations = $this->repository->paginateTrashed($search, $queryParams);
+        // Whitelist sort column to prevent SQL injection
+        $allowedSortColumns = ['declaration_number', 'declaration_type', 'status', 'created_at', 'updated_at', 'year'];
+        if (!in_array($sort, $allowedSortColumns)) {
+            $sort = 'created_at';
+        }
+
+        $declarations = $this->repository->paginateTrashed($search, $sort, $direction);
 
         return compact('declarations', 'search');
     }
@@ -209,5 +218,22 @@ class CustomDeclarationService
     {
         $declaration = $this->repository->findTrashed($id);
         $this->repository->restore($declaration);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    //  Analytics
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Get data for analytics page.
+     *
+     * @return array{years: Collection, statuses: Collection}
+     */
+    public function getAnalyticsData(): array
+    {
+        return [
+            'years'    => $this->repository->getCountsByYear(),
+            'statuses' => $this->repository->getCountsByStatus(),
+        ];
     }
 }

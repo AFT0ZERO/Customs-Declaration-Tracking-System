@@ -38,8 +38,11 @@
                         @endif
                     @endauth
                     <a href="{{route("declaration.showRestore")}}" class="btn btn-dark w-100 text-end py-2 {{ request()->routeIs('declaration.showRestore') ? 'active' : '' }}">
-                    <i class="fas fa-archive"></i> الارشيف
-                </a>
+                        <i class="fas fa-archive"></i> الارشيف
+                    </a>
+                    <a href="{{route("analytics")}}" class="btn btn-dark w-100 text-end py-2 {{ request()->routeIs('analytics') ? 'active' : '' }}">
+                        <i class="fas fa-chart-bar"></i> الاحصائيات
+                    </a>
                     <a href="#" class="btn btn-dark w-100 text-end py-2"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="fas fa-sign-out-alt"></i> تسجيل الخروج

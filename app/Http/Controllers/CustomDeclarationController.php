@@ -75,7 +75,8 @@ class CustomDeclarationController extends Controller
         ['declarations' => $declarations, 'search' => $search] =
             $this->service->getTrashedDeclarations(
                 searchInput: $request->input('search'),
-                queryParams: $request->query(),
+                sort:        $request->query('sort', 'created_at'),
+                direction:   $request->query('direction', 'desc'),
             );
 
         return view('restore', compact('declarations', 'search'));
@@ -85,6 +86,9 @@ class CustomDeclarationController extends Controller
     //  GET /dashboard/restore/{id}
     // ──────────────────────────────────────────────────────────────────────────
 
+    /**
+     * Restore a soft-deleted declaration.
+     */
     public function restore(int $id): RedirectResponse
     {
         $this->service->restoreDeclaration($id);
@@ -92,5 +96,16 @@ class CustomDeclarationController extends Controller
         session()->flash('success', 'تم استرجاع البيان');
 
         return to_route('declaration.showRestore');
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    //  GET /analytics
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public function showAnalytics(): View
+    {
+        $data = $this->service->getAnalyticsData();
+
+        return view('analytics', $data);
     }
 }

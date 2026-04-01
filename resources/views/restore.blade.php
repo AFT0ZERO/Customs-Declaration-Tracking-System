@@ -9,9 +9,11 @@
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="text-center text-sm-start mb-4"> ارشيف البيانات الجمركية</h1>
-                    <form method="GET" action="{{route('declaration.showRestore')}}" class="d-flex mt-3 mt-sm-0">
-                        <input type="text" name="search" class="form-control me-2" placeholder="بحث عن بيان..."
-                            aria-label="Search...">
+                    <form method="GET" action="{{route('declaration.showRestore')}}" class="d-flex mt-3 mt-sm-0 gap-2">
+                        <input type="text" name="search" class="form-control" placeholder="بحث عن بيان..."
+                            aria-label="Search..." value="{{ request('search') }}">
+                        <input type="hidden" name="sort" value="{{ request('sort', 'created_at') }}">
+                        <input type="hidden" name="direction" value="{{ request('direction', 'desc') }}">
                         <button type="submit" class="btn btn-warning">بحث</button>
                     </form>
                 </div>
@@ -43,16 +45,95 @@
                     <thead class="table-success">
                         <tr>
                             <th>#</th>
-                            <th>رقم البيان الجمركي</th>
-                            <th>مركز البيان</th>
-                            <th>السنة</th>
-                            <th>الحالة الحالية</th>
-                            <th>تاريخ الإضافة</th>
-                            <th>اخر تعديل</th>
+                            <th>
+                               رقم البيان
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'declaration_number', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'declaration_number' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'declaration_number', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'declaration_number' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                مركز البيان
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'declaration_type', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'declaration_type' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'declaration_type', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'declaration_type' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                السنة
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'year', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'year' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'year', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'year' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                الحالة الحالية
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'status' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'status' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                تاريخ الإضافة
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'created_at' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'created_at' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            <th>
+                                اخر تعديل
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'updated_at', 'direction' => 'asc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'updated_at' && request('direction') === 'asc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-up"></i>
+                                    </a>
+                                    <a href="{{ request()->fullUrlWithQuery(['sort' => 'updated_at', 'direction' => 'desc']) }}"
+                                        class="btn btn-sm {{ request('sort') === 'updated_at' && request('direction') === 'desc' ? 'btn-success' : '' }}">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </th>
                             <th>العمليات</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @if($declarations->items() == [])
+                            <div class="alert alert-danger alert-dismissible fade show" id="alert-show">
+                                لا يوجد بيانات مطابقة
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
                         @foreach($declarations as $declaration)
                             <tr>
                                 <td>{{$loop->iteration}}</td>
@@ -92,6 +173,15 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
 
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Close success alert after 3 seconds
+            setTimeout(function () {
+                $('#alert-show').fadeOut('slow', function () {
+                    $(this).remove();
+                });
+            }, 3000);
+        });
+    </script>
 
 @endsection

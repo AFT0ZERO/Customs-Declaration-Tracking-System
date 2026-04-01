@@ -105,18 +105,29 @@ class CustomDeclarationRepository
      * Return paginated trashed declarations, optionally filtered by declaration_number.
      *
      * @param string|null $search   Already-normalised search string.
-     * @param array       $queryParams  Original request query for ->appends().
+     * @param string      $sort     Column to sort by (already validated by caller).
+     * @param string      $direction 'asc' | 'desc'
+     * @param int         $perPage
      */
     public function paginateTrashed(
         ?string $search,
-        array $queryParams = [],
+        string $sort,
+        string $direction,
         int $perPage = 50
     ): LengthAwarePaginator {
-        return CustomDeclaration::onlyTrashed()
-            ->when($search, fn($q) => $q->where('declaration_number', $search))
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage)
-            ->appends($queryParams);
+        $query = CustomDeclaration::onlyTrashed();
+
+        if (!empty($search)) {
+            $query->where('declaration_number', '=', $search);
+        }
+
+        if ($sort === 'declaration_number') {
+            $query->orderByRaw("CAST(declaration_number AS UNSIGNED) " . $direction);
+        } else {
+            $query->orderBy($sort, $direction);
+        }
+
+        return $query->paginate($perPage);
     }
 
     /**
@@ -139,5 +150,30 @@ class CustomDeclarationRepository
     public function createHistory(array $data): DeclarationHistory
     {
         return DeclarationHistory::create($data);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    //  Analytics
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Get declaration counts grouped by year.
+     */
+    public function getCountsByYear(): Collection
+    {
+        return CustomDeclaration::selectRaw('year, COUNT(*) as count')
+            ->groupBy('year')
+            ->orderBy('year', 'desc')
+            ->get();
+    }
+
+    /**
+     * Get declaration counts grouped by status.
+     */
+    public function getCountsByStatus(): Collection
+    {
+        return CustomDeclaration::selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get();
     }
 }
