@@ -1,12 +1,120 @@
-<form method="GET" action="{{ $action }}" class="d-flex mt-3 mt-sm-0 gap-2 w-100 flex-column flex-sm-row" id="searchForm">
-    <div class="d-flex flex-wrap align-items-center gap-2 p-1 border rounded bg-white w-100" id="tagInputContainer">
-        <!-- tags will be injected here via JS -->
-        <input type="text" id="tagInput" class="border-0 flex-grow-1 p-1" style="outline: none; min-width: 150px;" placeholder="بحث عن بيانات... (افصل بمسافة)">
+<form method="GET" action="{{ $action }}" class="mt-3 mt-sm-0 w-100" id="searchForm">
+    <!-- Main Search Bar -->
+    <div class="d-flex gap-2 w-100 flex-column flex-sm-row">
+        <div class="d-flex flex-wrap align-items-center gap-2 p-1 border rounded bg-white w-100" id="tagInputContainer">
+            <!-- tags will be injected here via JS -->
+            <input type="text" id="tagInput" class="border-0 flex-grow-1 p-1" style="outline: none; min-width: 150px;" placeholder="بحث عن بيانات... (افصل بمسافة)">
+        </div>
+        
+        <input type="hidden" name="search" id="hiddenSearchInput" value="{{ $searchValue ?? request('search') }}">
+        <input type="hidden" name="sort" value="{{ request('sort', 'created_at') }}">
+        <input type="hidden" name="direction" value="{{ request('direction', 'desc') }}">
+        
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-warning py-2 px-4 shadow-sm" title="بحث">
+                <i class="bi bi-search"></i>
+            </button>
+            <button type="button" class="btn btn-secondary py-2 px-3 shadow-sm" data-bs-toggle="collapse" data-bs-target="#advancedFilters" aria-expanded="{{ !empty($filters) && (count(array_filter($filters)) > 0) ? 'true' : 'false' }}" aria-controls="advancedFilters" title="فلترة متقدمة">
+                <i class="bi bi-funnel"></i>
+            </button>
+        </div>
     </div>
-    <input type="hidden" name="search" id="hiddenSearchInput" value="{{ $searchValue ?? request('search') }}">
-    <input type="hidden" name="sort" value="{{ request('sort', 'created_at') }}">
-    <input type="hidden" name="direction" value="{{ request('direction', 'desc') }}">
-    <button type="submit" class="btn btn-warning py-2">بحث</button>
+
+    <!-- Advanced Filters Collapse -->
+    @php
+        $hasActiveFilters = isset($filters) && count(array_filter($filters)) > 0;
+    @endphp
+    <div class="collapse mt-3 {{ $hasActiveFilters ? 'show' : '' }}" id="advancedFilters">
+        <div class="card card-body bg-light border-0 shadow-sm">
+            <div class="row g-3">
+                
+                <!-- Status Filter -->
+                <div class="col-md-6 col-lg-3">
+                    <label class="form-label fw-bold small text-muted mb-2">الحالة الحالية</label>
+                    @php
+                        $selectedStatuses = request('statuses', []);
+                        $availableStatuses = [
+                            'عمان لغايات الفحص',
+                            'العقبة ساحة 4 غذاء',
+                            'العقبة غذاء البلد',
+                            'العقبة مكتب 4',
+                            'العقبة الارشيف',
+                            'عمان التاجر',
+                            'عمان'
+                        ];
+                    @endphp
+                    <div class="border rounded p-2 bg-white" style="max-height: 140px; overflow-y: auto;">
+                        @foreach($availableStatuses as $status)
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" name="statuses[]" value="{{ $status }}" id="status_{{ $loop->index }}" {{ in_array($status, $selectedStatuses) ? 'checked' : '' }}>
+                            <label class="form-check-label small" for="status_{{ $loop->index }}">
+                                {{ $status }}
+                            </label>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Declaration Type (Center) Filter -->
+                <div class="col-md-6 col-lg-3">
+                    <label class="form-label fw-bold small text-muted mb-2">مركز البيان</label>
+                    @php
+                        $selectedTypes = request('types', []);
+                        $availableTypes = [
+                            '220',
+                            '224',
+                            '900',
+                        ];
+                    @endphp
+                    <div class="border rounded p-2 bg-white" style="max-height: 140px; overflow-y: auto;">
+                        @foreach($availableTypes as $type)
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" name="types[]" value="{{ $type }}" id="type_{{ $loop->index }}" {{ in_array($type, $selectedTypes) ? 'checked' : '' }}>
+                            <label class="form-check-label small" for="type_{{ $loop->index }}">
+                                {{ $type }}
+                            </label>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Date Range Filters -->
+                <div class="col-md-12 col-lg-6">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-muted">تاريخ الإضافة</label>
+                            <div class="input-group">
+                                <span class="input-group-text">من</span>
+                                <input type="date" name="created_from" class="form-control" value="{{ request('created_from') }}">
+                                <span class="input-group-text">إلى</span>
+                                <input type="date" name="created_to" class="form-control" value="{{ request('created_to') }}">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-muted">تاريخ التعديل</label>
+                            <div class="input-group">
+                                <span class="input-group-text">من</span>
+                                <input type="date" name="updated_from" class="form-control" value="{{ request('updated_from') }}">
+                                <span class="input-group-text">إلى</span>
+                                <input type="date" name="updated_to" class="form-control" value="{{ request('updated_to') }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+                    <a href="{{ $action }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> مسح الفلاتر
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> تطبيق الفلترة
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </form>
 
 <script>

@@ -17,6 +17,15 @@
                                 <i class="bi bi-arrow-counterclockwise"></i> استرجاع المحدد
                             </button>
                         </form>
+                        @if(auth()->user()->is_admin)
+                            <form action="{{ route('declaration.massForceDelete') }}" method="POST" id="massForceDeleteForm" style="display: none;">
+                                @csrf
+                                <div id="hiddenForceDeleteDeclarationIds"></div>
+                                <button type="submit" class="btn btn-danger" id="massForceDeleteBtn">
+                                    <i class="bi bi-trash"></i> حذف نهائي
+                                </button>
+                            </form>
+                        @endif
                     </div>
                     @include('partials.search-tags', ['action' => route('declaration.showRestore'), 'searchValue' => request('search')])
                 </div>
@@ -88,16 +97,74 @@
                                             class="btn btn-warning text-white" title="عرض حركات البيان">
                                             <i class="bi bi-clock"></i>
                                         </a>
-                                        <a href="{{ route('declaration.restore', $declaration->id) }}"
-                                            class="btn btn-success text-white" title="ارجاع البيان">
-                                            <i class="bi bi-arrow-counterclockwise"></i>
-                                        </a>
+
+                                        <button type="button" class="btn btn-primary text-white edit-statement-btn"
+                                            data-id="{{ $declaration->id }}"
+                                            data-number="{{ $declaration->declaration_number }}"
+                                            data-status="{{ $declaration->status }}"
+                                            data-year="{{ $declaration->year }}"
+                                            data-type="{{ $declaration->declaration_type }}"
+                                            title="تحرير البيان">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Edit Statement Modal -->
+            <div class="modal fade" id="editStatementModal" tabindex="-1" aria-labelledby="editStatementModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editStatementModalLabel">تحرير البيان</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th>رقم البيان:</th>
+                                    <td id="modalDeclarationNumber"></td>
+                                </tr>
+                                <tr>
+                                    <th>المركز:</th>
+                                    <td id="modalDeclarationType"></td>
+                                </tr>
+                                <tr>
+                                    <th>السنة:</th>
+                                    <td id="modalDeclarationYear"></td>
+                                </tr>
+                                <tr>
+                                    <th>الحالة:</th>
+                                    <td id="modalDeclarationStatus"></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-between">
+                            <div class="d-flex gap-2">
+                                <a id="modalRestoreBtn" href="#" class="btn btn-success">
+                                    <i class="bi bi-arrow-counterclockwise"></i> استرجاع البيان
+                                </a>
+
+                                @if(auth()->user()->is_admin)
+                                    <form id="modalForceDeleteForm" method="POST" action="">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger"
+                                            onclick="return confirm('هل أنت متأكد أنك تريد حذف هذا البيان نهائياً؟ هذا الإجراء غير قابل للتراجع.')">
+                                            <i class="bi bi-trash"></i> حذف نهائي
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             </div>
 
             <!-- Pagination -->
@@ -128,13 +195,17 @@
             const rowCheckboxes = document.querySelectorAll('.restore-row-checkbox');
             const massRestoreForm = document.getElementById('massRestoreForm');
             const hiddenRestoreDeclarationIdsContainer = document.getElementById('hiddenRestoreDeclarationIds');
+            const massForceDeleteForm = document.getElementById('massForceDeleteForm');
+            const hiddenForceDeleteDeclarationIdsContainer = document.getElementById('hiddenForceDeleteDeclarationIds');
 
-            function updateMassRestoreButtonVisibility() {
+            function updateMassButtonsVisibility() {
                 const checkedCount = document.querySelectorAll('.restore-row-checkbox:checked').length;
                 if (checkedCount > 0) {
-                    massRestoreForm.style.display = 'inline-block';
+                    if (massRestoreForm) massRestoreForm.style.display = 'inline-block';
+                    if (massForceDeleteForm) massForceDeleteForm.style.display = 'inline-block';
                 } else {
-                    massRestoreForm.style.display = 'none';
+                    if (massRestoreForm) massRestoreForm.style.display = 'none';
+                    if (massForceDeleteForm) massForceDeleteForm.style.display = 'none';
                 }
             }
 
@@ -143,7 +214,7 @@
                     rowCheckboxes.forEach(checkbox => {
                         checkbox.checked = this.checked;
                     });
-                    updateMassRestoreButtonVisibility();
+                    updateMassButtonsVisibility();
                 });
             }
 
@@ -157,7 +228,7 @@
                         selectAllCheckbox.indeterminate = someChecked && !allChecked;
                     }
                     
-                    updateMassRestoreButtonVisibility();
+                    updateMassButtonsVisibility();
                 });
             });
 
@@ -186,7 +257,59 @@
                     });
                 });
             }
+
+            if (massForceDeleteForm) {
+                massForceDeleteForm.addEventListener('submit', function (e) {
+                    hiddenForceDeleteDeclarationIdsContainer.innerHTML = ''; // Clear previous
+                    const checkedCheckboxes = document.querySelectorAll('.restore-row-checkbox:checked');
+                    
+                    if (checkedCheckboxes.length === 0) {
+                        e.preventDefault();
+                        alert('يرجى تحديد بيان واحد على الأقل.');
+                        return;
+                    }
+
+                    if (!confirm('هل أنت متأكد أنك تريد حذف البيانات المحددة نهائياً؟ هذا الإجراء غير قابل للتراجع.')) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    checkedCheckboxes.forEach(checkbox => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'declaration_ids[]';
+                        input.value = checkbox.value;
+                        hiddenForceDeleteDeclarationIdsContainer.appendChild(input);
+                    });
+                });
+            }
+
+            // Modal logic
+            const editStatementButtons = document.querySelectorAll('.edit-statement-btn');
+            const editStatementModal = new bootstrap.Modal(document.getElementById('editStatementModal'));
+            const modalDeclarationNumber = document.getElementById('modalDeclarationNumber');
+            const modalDeclarationType = document.getElementById('modalDeclarationType');
+            const modalDeclarationYear = document.getElementById('modalDeclarationYear');
+            const modalDeclarationStatus = document.getElementById('modalDeclarationStatus');
+            const modalRestoreBtn = document.getElementById('modalRestoreBtn');
+            const modalForceDeleteForm = document.getElementById('modalForceDeleteForm');
+
+            editStatementButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    modalDeclarationNumber.textContent = this.dataset.number;
+                    modalDeclarationType.textContent = this.dataset.type;
+                    modalDeclarationYear.textContent = this.dataset.year;
+                    modalDeclarationStatus.textContent = this.dataset.status;
+
+                    modalRestoreBtn.href = `/dashboard/restore/${id}`;
+                    if (modalForceDeleteForm) {
+                        modalForceDeleteForm.action = `/declaration/force-delete/${id}`;
+                    }
+
+                    editStatementModal.show();
+                });
+            });
         });
     </script>
-
 @endsection

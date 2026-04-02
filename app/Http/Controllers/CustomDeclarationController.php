@@ -21,13 +21,23 @@ class CustomDeclarationController extends Controller
 
     public function index(Request $request): View
     {
+        $filters = [
+            'statuses'     => $request->input('statuses', []),
+            'types'        => $request->input('types', []),
+            'created_from' => $request->input('created_from'),
+            'created_to'   => $request->input('created_to'),
+            'updated_from' => $request->input('updated_from'),
+            'updated_to'   => $request->input('updated_to'),
+        ];
+
         $declarations = $this->service->getPaginatedDeclarations(
             searchInput: $request->query('search'),
+            filters:     $filters,
             sort:        $request->query('sort', 'created_at'),
             direction:   $request->query('direction', 'desc'),
         );
 
-        return view('dashboard', compact('declarations'));
+        return view('dashboard', compact('declarations', 'filters'));
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -95,14 +105,24 @@ class CustomDeclarationController extends Controller
 
     public function showRestore(Request $request): View
     {
+        $filters = [
+            'statuses'     => $request->input('statuses', []),
+            'types'        => $request->input('types', []),
+            'created_from' => $request->input('created_from'),
+            'created_to'   => $request->input('created_to'),
+            'updated_from' => $request->input('updated_from'),
+            'updated_to'   => $request->input('updated_to'),
+        ];
+
         ['declarations' => $declarations, 'search' => $search] =
             $this->service->getTrashedDeclarations(
                 searchInput: $request->input('search'),
+                filters:     $filters,
                 sort:        $request->query('sort', 'created_at'),
                 direction:   $request->query('direction', 'desc'),
             );
 
-        return view('restore', compact('declarations', 'search'));
+        return view('restore', compact('declarations', 'search', 'filters'));
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -153,5 +173,44 @@ class CustomDeclarationController extends Controller
         $data = $this->service->getAnalyticsData();
 
         return view('analytics', $data);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    //  DELETE /declaration/force-delete/{id}
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Permanently delete a declaration (admin only).
+     */
+    public function forceDelete(int $id): RedirectResponse
+    {
+        $this->service->forceDeleteDeclaration($id);
+
+        session()->flash('success', 'تم حذف البيان نهائياً!');
+
+        return to_route('declaration.showRestore');
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    //  POST /declaration/mass-force-delete
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Permanently delete multiple declarations (admin only).
+     */
+    public function massForceDelete(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'declaration_ids'   => ['required', 'array', 'min:1'],
+            'declaration_ids.*' => ['integer'],
+        ]);
+
+        $deletedCount = $this->service->massForceDeleteDeclarations(
+            ids: $request->input('declaration_ids')
+        );
+
+        session()->flash('success', "تم حذف {$deletedCount} بيان نهائياً!");
+
+        return redirect()->back();
     }
 }

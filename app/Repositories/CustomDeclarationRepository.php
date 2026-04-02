@@ -16,28 +16,49 @@ class CustomDeclarationRepository
     /**
      * Return a paginated list of active (non-deleted) declarations.
      *
-     * @param array|null $search    Filtered declaration_number array (already normalised by caller).
-     * @param string      $sort      Column to sort by (already validated by caller).
-     * @param string      $direction 'asc' | 'desc'
-     * @param int         $perPage
+     * @param  array|null  $search  Filtered declaration_number array (already normalised by caller).
+     * @param  array  $filters  Associative array of active filters.
+     * @param  string  $sort  Column to sort by (already validated by caller).
+     * @param  string  $direction  'asc' | 'desc'
      */
     public function paginateActive(
         ?array $search,
+        array $filters,
         string $sort,
         string $direction,
         int $perPage = 50
     ): LengthAwarePaginator {
         $query = CustomDeclaration::query();
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->whereIn('declaration_number', $search);
         }
+
+        if (! empty($filters['statuses'])) {
+            $query->whereIn('status', $filters['statuses']);
+        }
+        if (! empty($filters['types'])) {
+            $query->whereIn('declaration_type', $filters['types']);
+        }
+        if (! empty($filters['created_from'])) {
+            $query->whereDate('created_at', '>=', $filters['created_from']);
+        }
+        if (! empty($filters['created_to'])) {
+            $query->whereDate('created_at', '<=', $filters['created_to']);
+        }
+        if (! empty($filters['updated_from'])) {
+            $query->whereDate('updated_at', '>=', $filters['updated_from']);
+        }
+        if (! empty($filters['updated_to'])) {
+            $query->whereDate('updated_at', '<=', $filters['updated_to']);
+        }
+
         if ($sort === 'declaration_number') {
-            $query->orderByRaw("CAST(declaration_number AS UNSIGNED) " . $direction);
+            $query->orderByRaw('CAST(declaration_number AS UNSIGNED) '.$direction);
         } else {
             $query->orderBy($sort, $direction);
         }
-        
+
         return $query->paginate($perPage);
     }
 
@@ -102,27 +123,55 @@ class CustomDeclarationRepository
     }
 
     /**
+     * Permanently delete a declaration (force delete, bypassing soft delete).
+     */
+    public function forceDelete(CustomDeclaration $declaration): void
+    {
+        $declaration->forceDelete();
+    }
+
+    /**
      * Return paginated trashed declarations, optionally filtered by declaration_number.
      *
-     * @param array|null  $search   Already-normalised search array.
-     * @param string      $sort     Column to sort by (already validated by caller).
-     * @param string      $direction 'asc' | 'desc'
-     * @param int         $perPage
+     * @param  array|null  $search  Already-normalised search array.
+     * @param  array  $filters  Associative array of active filters.
+     * @param  string  $sort  Column to sort by (already validated by caller).
+     * @param  string  $direction  'asc' | 'desc'
      */
     public function paginateTrashed(
         ?array $search,
+        array $filters,
         string $sort,
         string $direction,
         int $perPage = 50
     ): LengthAwarePaginator {
         $query = CustomDeclaration::onlyTrashed();
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->whereIn('declaration_number', $search);
         }
 
+        if (! empty($filters['statuses'])) {
+            $query->whereIn('status', $filters['statuses']);
+        }
+        if (! empty($filters['types'])) {
+            $query->whereIn('declaration_type', $filters['types']);
+        }
+        if (! empty($filters['created_from'])) {
+            $query->whereDate('created_at', '>=', $filters['created_from']);
+        }
+        if (! empty($filters['created_to'])) {
+            $query->whereDate('created_at', '<=', $filters['created_to']);
+        }
+        if (! empty($filters['updated_from'])) {
+            $query->whereDate('updated_at', '>=', $filters['updated_from']);
+        }
+        if (! empty($filters['updated_to'])) {
+            $query->whereDate('updated_at', '<=', $filters['updated_to']);
+        }
+
         if ($sort === 'declaration_number') {
-            $query->orderByRaw("CAST(declaration_number AS UNSIGNED) " . $direction);
+            $query->orderByRaw('CAST(declaration_number AS UNSIGNED) '.$direction);
         } else {
             $query->orderBy($sort, $direction);
         }

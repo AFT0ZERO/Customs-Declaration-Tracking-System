@@ -46,6 +46,7 @@ class CustomDeclarationService
      */
     public function getPaginatedDeclarations(
         ?string $searchInput,
+        array   $filters   = [],
         string  $sort      = 'created_at',
         string  $direction = 'desc'
     ): LengthAwarePaginator {
@@ -68,7 +69,7 @@ class CustomDeclarationService
             $sort = 'created_at';
         }
 
-        return $this->repository->paginateActive($searchArray, $sort, $direction);
+        return $this->repository->paginateActive($searchArray, $filters, $sort, $direction);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -237,6 +238,7 @@ class CustomDeclarationService
      */
     public function getTrashedDeclarations(
         ?string $searchInput,
+        array   $filters   = [],
         string  $sort      = 'created_at',
         string  $direction = 'desc'
     ): array {
@@ -258,7 +260,7 @@ class CustomDeclarationService
             $sort = 'created_at';
         }
 
-        $declarations = $this->repository->paginateTrashed($searchArray, $sort, $direction);
+        $declarations = $this->repository->paginateTrashed($searchArray, $filters, $sort, $direction);
         $search = $searchInput;
 
         return compact('declarations', 'search');
@@ -299,6 +301,42 @@ class CustomDeclarationService
         }
 
         return $restoredCount;
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    //  forceDelete
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Permanently delete a declaration (including related history records).
+     * Admin only operation.
+     */
+    public function forceDeleteDeclaration(int $id): void
+    {
+        $declaration = $this->repository->findWithTrashedOrFail($id);
+        $this->repository->forceDelete($declaration);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    //  massForceDelete
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Permanently delete multiple declarations (admin only).
+     */
+    public function massForceDeleteDeclarations(array $ids): int
+    {
+        $deletedCount = 0;
+
+        foreach ($ids as $id) {
+            $declaration = $this->repository->findTrashed($id);
+            if ($declaration) {
+                $this->repository->forceDelete($declaration);
+                $deletedCount++;
+            }
+        }
+
+        return $deletedCount;
     }
 
     // ──────────────────────────────────────────────────────────────────────────
