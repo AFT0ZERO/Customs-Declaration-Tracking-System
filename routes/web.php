@@ -20,9 +20,11 @@ Route::get('/declaration/history/{id}', [CustomDeclarationController::class, 'sh
 Route::get('declaration/restore', [CustomDeclarationController::class, "showRestore"])->name("declaration.showRestore");
 Route::get('dashboard/restore/{id}', [CustomDeclarationController::class, "restore"])->name("declaration.restore");
 
+Route::post('/declaration/mass-update', [CustomDeclarationController::class, 'massUpdateStatus'])->name('declaration.massUpdateStatus');
+Route::post('/declaration/mass-restore', [CustomDeclarationController::class, 'massRestore'])->name('declaration.massRestore');
 
 
-// Users CRUD (admin only)
+// admin only
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::resource('users', UserController::class)->except(['show']);
     Route::get('/analytics', [CustomDeclarationController::class, 'showAnalytics'])

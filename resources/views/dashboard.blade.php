@@ -10,9 +10,15 @@
                 <div>
                     <h2 class="text-center text-sm-start mb-4">اسم المستخدم :{{Auth::user()->name}} <br> حركة البيانات
                         الجمركية </h2>
-                    <button class="btn btn-success mt-3 mt-sm-0 mb-3" data-bs-toggle="modal"
-                        data-bs-target="#addDeclarationModal">إضافة بيان جديد
-                    </button>
+                    <div class="d-flex flex-wrap gap-2 mb-3 mt-3 mt-sm-0">
+                        <button class="btn btn-success" data-bs-toggle="modal"
+                            data-bs-target="#addDeclarationModal">إضافة بيان جديد
+                        </button>
+                        <button class="btn btn-warning text-dark" id="massEditBtn" data-bs-toggle="modal"
+                            data-bs-target="#massEditModal" style="display: none;">
+                            <i class="bi bi-pencil-square"></i> تعديل المحدد
+                        </button>
+                    </div>
                     <form method="GET" action="{{route('dashboard')}}" class="d-flex mt-3 mt-sm-0 gap-2">
                         <input type="text" name="search" class="form-control " placeholder="بحث عن بيان..."
                             aria-label="Search..." value="{{ request('search') }}">
@@ -45,6 +51,9 @@
                 <table class="table table-bordered table-striped">
                     <thead class="table-success">
                         <tr>
+                            <th>
+                                <input type="checkbox" id="selectAll" class="form-check-input">
+                            </th>
                             <th>#</th>
                             <th>
                                 رقم البيان
@@ -137,6 +146,9 @@
 
                         @foreach($declarations as $declaration)
                             <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input row-checkbox" value="{{ $declaration->id }}">
+                                </td>
                                 <td>{{$loop->iteration}}</td>
                                 <td>{{ $declaration->declaration_number }}</td>
                                 <td>{{ $declaration->declaration_type }}</td>
@@ -299,6 +311,48 @@
                         </div>
 
                     </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mass Edit Status Modal -->
+            <div class="modal fade" id="massEditModal" tabindex="-1" aria-labelledby="massEditModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="massEditModalLabel">تعديل حالة البيانات المحددة</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="{{ route('declaration.massUpdateStatus') }}" method="POST" id="massUpdateStatusForm">
+                            <div class="modal-body">
+                                @csrf
+                                <div id="hiddenDeclarationIds"></div>
+                                <div class="alert alert-info">
+                                    سيتم تعديل الحالة لـ <span id="selectedCountDisplay" class="fw-bold fs-5">0</span> بيان.
+                                </div>
+                                <div class="form-group mb-3 ">
+                                    <label for="mass-edit-status">الحالة</label>
+                                    <select name="status" id="mass-edit-status" class="form-control custom-select" required>
+                                        <option value="عمان لغايات الفحص">عمان لغايات الفحص</option>
+                                        <option value="العقبة ساحة 4 غذاء">العقبة ساحة 4 غذاء</option>
+                                        <option value="العقبة غذاء البلد">العقبة غذاء البلد</option>
+                                        <option value="العقبة مكتب 4">العقبة مكتب 4</option>
+                                        <option value="العقبة الارشيف">العقبة الارشيف</option>
+                                        <option value="عمان التاجر">عمان التاجر</option>
+                                        <option value="عمان">عمان</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="mass-edit-description">وصف إضافي</label>
+                                    <textarea name="description" id="mass-edit-description" class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                                <button type="submit" class="btn btn-success">تأكيد التعديل</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
@@ -379,6 +433,77 @@
                     }
                 });
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+            const massEditBtn = document.getElementById('massEditBtn');
+            const massUpdateStatusForm = document.getElementById('massUpdateStatusForm');
+            const hiddenDeclarationIdsContainer = document.getElementById('hiddenDeclarationIds');
+            const selectedCountDisplay = document.getElementById('selectedCountDisplay');
+
+            function updateMassEditButtonVisibility() {
+                const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+                if (checkedCount > 0) {
+                    massEditBtn.style.display = 'inline-block';
+                } else {
+                    massEditBtn.style.display = 'none';
+                }
+            }
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function () {
+                    rowCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateMassEditButtonVisibility();
+                });
+            }
+
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const allChecked = Array.from(rowCheckboxes).every(c => c.checked);
+                    const someChecked = Array.from(rowCheckboxes).some(c => c.checked);
+                    
+                    if (selectAllCheckbox) {
+                        selectAllCheckbox.checked = allChecked;
+                        selectAllCheckbox.indeterminate = someChecked && !allChecked;
+                    }
+                    
+                    updateMassEditButtonVisibility();
+                });
+            });
+
+            if (massUpdateStatusForm) {
+                massUpdateStatusForm.addEventListener('submit', function (e) {
+                    hiddenDeclarationIdsContainer.innerHTML = ''; // Clear previous
+                    const checkedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+                    
+                    if (checkedCheckboxes.length === 0) {
+                        e.preventDefault();
+                        alert('يرجى تحديد بيان واحد على الأقل.');
+                        return;
+                    }
+
+                    checkedCheckboxes.forEach(checkbox => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'declaration_ids[]';
+                        input.value = checkbox.value;
+                        hiddenDeclarationIdsContainer.appendChild(input);
+                    });
+                });
+            }
+
+            // Update count before modal shows up
+            const massEditModal = document.getElementById('massEditModal');
+            if (massEditModal) {
+                massEditModal.addEventListener('show.bs.modal', function () {
+                    const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+                    selectedCountDisplay.textContent = checkedCount;
+                });
+            }
         });
 
     </script>

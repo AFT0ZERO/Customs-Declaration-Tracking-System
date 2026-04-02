@@ -55,6 +55,29 @@ class CustomDeclarationController extends Controller
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+    //  POST /declaration/mass-update
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public function massUpdateStatus(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'declaration_ids'   => ['required', 'array', 'min:1'],
+            'declaration_ids.*' => ['integer', 'exists:custom_declarations,id'],
+            'status'            => ['required', 'string', 'max:255'],
+            'description'       => ['nullable', 'string'],
+        ]);
+
+        $updatedCount = $this->service->massUpdateDeclarations(
+            ids: $request->input('declaration_ids'),
+            status: $request->input('status'),
+            description: $request->input('description'),
+            userId: auth()->id()
+        );
+
+        return redirect()->back()->with('success', "تم تحديث حالة {$updatedCount} بيان بنجاح!");
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
     //  GET /declaration/history/{id}
     // ──────────────────────────────────────────────────────────────────────────
 
@@ -96,6 +119,29 @@ class CustomDeclarationController extends Controller
         session()->flash('success', 'تم استرجاع البيان');
 
         return to_route('declaration.showRestore');
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    //  POST /declaration/mass-restore
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Restore multiple soft-deleted declarations.
+     */
+    public function massRestore(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'declaration_ids'   => ['required', 'array', 'min:1'],
+            'declaration_ids.*' => ['integer'],
+        ]);
+
+        $restoredCount = $this->service->massRestoreDeclarations(
+            ids: $request->input('declaration_ids')
+        );
+
+        session()->flash('success', "تم استرجاع {$restoredCount} بيان بنجاح!");
+
+        return redirect()->back();
     }
 
     // ──────────────────────────────────────────────────────────────────────────

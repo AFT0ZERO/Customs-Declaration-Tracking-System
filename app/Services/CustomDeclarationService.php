@@ -160,6 +160,44 @@ class CustomDeclarationService
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+    //  massUpdateDeclarations
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Update the status of multiple declarations at once.
+     */
+    public function massUpdateDeclarations(array $ids, string $status, ?string $description, int $userId): int
+    {
+        $updatedCount = 0;
+
+        foreach ($ids as $id) {
+            $declaration = $this->repository->findOrFail($id);
+            
+            if ($declaration->status !== $status) {
+                $declaration->status = $status;
+                
+                // Record the status-change history
+                $this->repository->createHistory([
+                    'user_id'        => $userId,
+                    'declaration_id' => $declaration->id,
+                    'action'         => $status,
+                    'description'    => $description ?? 'لا يوجد',
+                ]);
+
+                // Archive immediately when the new status demands it
+                if ($status === 'العقبة الارشيف') {
+                    $this->repository->delete($declaration);
+                }
+
+                $this->repository->save($declaration);
+                $updatedCount++;
+            }
+        }
+
+        return $updatedCount;
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
     //  showHistory
     // ──────────────────────────────────────────────────────────────────────────
 
@@ -217,7 +255,31 @@ class CustomDeclarationService
     public function restoreDeclaration(int $id): void
     {
         $declaration = $this->repository->findTrashed($id);
-        $this->repository->restore($declaration);
+        if ($declaration) {
+            $this->repository->restore($declaration);
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    //  massRestoreDeclarations
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Restore multiple soft-deleted declarations at once.
+     */
+    public function massRestoreDeclarations(array $ids): int
+    {
+        $restoredCount = 0;
+
+        foreach ($ids as $id) {
+            $declaration = $this->repository->findTrashed($id);
+            if ($declaration) {
+                $this->repository->restore($declaration);
+                $restoredCount++;
+            }
+        }
+
+        return $restoredCount;
     }
 
     // ──────────────────────────────────────────────────────────────────────────

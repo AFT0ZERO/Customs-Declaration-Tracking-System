@@ -9,6 +9,15 @@
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="text-center text-sm-start mb-4"> ارشيف البيانات الجمركية</h1>
+                    <div class="d-flex flex-wrap gap-2 mb-3 mt-3 mt-sm-0">
+                        <form action="{{ route('declaration.massRestore') }}" method="POST" id="massRestoreForm" style="display: none;">
+                            @csrf
+                            <div id="hiddenRestoreDeclarationIds"></div>
+                            <button type="submit" class="btn btn-success" id="massRestoreBtn">
+                                <i class="bi bi-arrow-counterclockwise"></i> استرجاع المحدد
+                            </button>
+                        </form>
+                    </div>
                     <form method="GET" action="{{route('declaration.showRestore')}}" class="d-flex mt-3 mt-sm-0 gap-2">
                         <input type="text" name="search" class="form-control" placeholder="بحث عن بيان..."
                             aria-label="Search..." value="{{ request('search') }}">
@@ -17,9 +26,11 @@
                         <button type="submit" class="btn btn-warning">بحث</button>
                     </form>
                 </div>
-                <a href="{{route("dashboard")}}" style="color: white ;text-decoration:none">
-                    <button class="btn btn-success mt-3 mt-sm-0"> العوده</button>
-                </a>
+                <div class="d-flex flex-column align-items-end">
+                    <a href="{{route("dashboard")}}" style="color: white; text-decoration:none">
+                        <button class="btn btn-success mt-3 mt-sm-0"> العوده</button>
+                    </a>
+                </div>
             </div>
 
             @if(session('success'))
@@ -44,6 +55,9 @@
                 <table class="table table-bordered table-striped">
                     <thead class="table-success">
                         <tr>
+                            <th>
+                                <input type="checkbox" id="selectAllRestore" class="form-check-input">
+                            </th>
                             <th>#</th>
                             <th>
                                رقم البيان
@@ -136,6 +150,9 @@
 
                         @foreach($declarations as $declaration)
                             <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input restore-row-checkbox" value="{{ $declaration->id }}">
+                                </td>
                                 <td>{{$loop->iteration}}</td>
                                 <td>{{ $declaration->declaration_number }}</td>
                                 <td>{{ $declaration->declaration_type }}</td>
@@ -181,6 +198,71 @@
                     $(this).remove();
                 });
             }, 3000);
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectAllCheckbox = document.getElementById('selectAllRestore');
+            const rowCheckboxes = document.querySelectorAll('.restore-row-checkbox');
+            const massRestoreForm = document.getElementById('massRestoreForm');
+            const hiddenRestoreDeclarationIdsContainer = document.getElementById('hiddenRestoreDeclarationIds');
+
+            function updateMassRestoreButtonVisibility() {
+                const checkedCount = document.querySelectorAll('.restore-row-checkbox:checked').length;
+                if (checkedCount > 0) {
+                    massRestoreForm.style.display = 'inline-block';
+                } else {
+                    massRestoreForm.style.display = 'none';
+                }
+            }
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function () {
+                    rowCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateMassRestoreButtonVisibility();
+                });
+            }
+
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const allChecked = Array.from(rowCheckboxes).every(c => c.checked);
+                    const someChecked = Array.from(rowCheckboxes).some(c => c.checked);
+                    
+                    if (selectAllCheckbox) {
+                        selectAllCheckbox.checked = allChecked;
+                        selectAllCheckbox.indeterminate = someChecked && !allChecked;
+                    }
+                    
+                    updateMassRestoreButtonVisibility();
+                });
+            });
+
+            if (massRestoreForm) {
+                massRestoreForm.addEventListener('submit', function (e) {
+                    hiddenRestoreDeclarationIdsContainer.innerHTML = ''; // Clear previous
+                    const checkedCheckboxes = document.querySelectorAll('.restore-row-checkbox:checked');
+                    
+                    if (checkedCheckboxes.length === 0) {
+                        e.preventDefault();
+                        alert('يرجى تحديد بيان واحد على الأقل.');
+                        return;
+                    }
+
+                    if (!confirm('هل أنت متأكد أنك تريد استرجاع البيانات المحددة؟')) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    checkedCheckboxes.forEach(checkbox => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'declaration_ids[]';
+                        input.value = checkbox.value;
+                        hiddenRestoreDeclarationIdsContainer.appendChild(input);
+                    });
+                });
+            }
         });
     </script>
 
