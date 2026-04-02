@@ -16,13 +16,13 @@ class CustomDeclarationRepository
     /**
      * Return a paginated list of active (non-deleted) declarations.
      *
-     * @param string|null $search    Filtered declaration_number (already normalised by caller).
+     * @param array|null $search    Filtered declaration_number array (already normalised by caller).
      * @param string      $sort      Column to sort by (already validated by caller).
      * @param string      $direction 'asc' | 'desc'
      * @param int         $perPage
      */
     public function paginateActive(
-        ?string $search,
+        ?array $search,
         string $sort,
         string $direction,
         int $perPage = 50
@@ -30,7 +30,7 @@ class CustomDeclarationRepository
         $query = CustomDeclaration::query();
 
         if (!empty($search)) {
-            $query->where('declaration_number', '=', $search);
+            $query->whereIn('declaration_number', $search);
         }
         if ($sort === 'declaration_number') {
             $query->orderByRaw("CAST(declaration_number AS UNSIGNED) " . $direction);
@@ -104,13 +104,13 @@ class CustomDeclarationRepository
     /**
      * Return paginated trashed declarations, optionally filtered by declaration_number.
      *
-     * @param string|null $search   Already-normalised search string.
+     * @param array|null  $search   Already-normalised search array.
      * @param string      $sort     Column to sort by (already validated by caller).
      * @param string      $direction 'asc' | 'desc'
      * @param int         $perPage
      */
     public function paginateTrashed(
-        ?string $search,
+        ?array $search,
         string $sort,
         string $direction,
         int $perPage = 50
@@ -118,7 +118,7 @@ class CustomDeclarationRepository
         $query = CustomDeclaration::onlyTrashed();
 
         if (!empty($search)) {
-            $query->where('declaration_number', '=', $search);
+            $query->whereIn('declaration_number', $search);
         }
 
         if ($sort === 'declaration_number') {

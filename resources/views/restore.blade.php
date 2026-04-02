@@ -18,11 +18,7 @@
                             </button>
                         </form>
                     </div>
-                    <x-search-tags 
-                        :route="'declaration.showRestore'" 
-                        :sort-key="request('sort', 'created_at')" 
-                        :sort-direction="request('direction', 'desc')"
-                    />
+                    @include('partials.search-tags', ['action' => route('declaration.showRestore'), 'searchValue' => request('search')])
                 </div>
                 <div class="d-flex flex-column align-items-end">
                     <a href="{{route("dashboard")}}" style="color: white; text-decoration:none">

@@ -49,9 +49,18 @@ class CustomDeclarationService
         string  $sort      = 'created_at',
         string  $direction = 'desc'
     ): LengthAwarePaginator {
-        // Normalise the search term
-        $search = $searchInput;
-        $search = $this->normalizeDeclarationNumber($search);
+        // Normalise the search terms
+        $searchArray = [];
+        if (!empty($searchInput)) {
+            $parts = preg_split('/\s+/', trim($searchInput));
+            foreach ($parts as $part) {
+                if (trim($part) !== '') {
+                    $searchArray[] = $this->normalizeDeclarationNumber(trim($part));
+                }
+            }
+        } else {
+            $searchArray = null;
+        }
         
         // Whitelist sort column to prevent SQL injection
         $allowedSortColumns = ['declaration_number', 'declaration_type', 'status', 'created_at', 'updated_at', 'year'];
@@ -59,7 +68,7 @@ class CustomDeclarationService
             $sort = 'created_at';
         }
 
-        return $this->repository->paginateActive($search, $sort, $direction);
+        return $this->repository->paginateActive($searchArray, $sort, $direction);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -231,8 +240,17 @@ class CustomDeclarationService
         string  $sort      = 'created_at',
         string  $direction = 'desc'
     ): array {
-        $search = $searchInput;
-        $search = $this->normalizeDeclarationNumber($search);
+        $searchArray = [];
+        if (!empty($searchInput)) {
+            $parts = preg_split('/\s+/', trim($searchInput));
+            foreach ($parts as $part) {
+                if (trim($part) !== '') {
+                    $searchArray[] = $this->normalizeDeclarationNumber(trim($part));
+                }
+            }
+        } else {
+            $searchArray = null;
+        }
 
         // Whitelist sort column to prevent SQL injection
         $allowedSortColumns = ['declaration_number', 'declaration_type', 'status', 'created_at', 'updated_at', 'year'];
@@ -240,7 +258,8 @@ class CustomDeclarationService
             $sort = 'created_at';
         }
 
-        $declarations = $this->repository->paginateTrashed($search, $sort, $direction);
+        $declarations = $this->repository->paginateTrashed($searchArray, $sort, $direction);
+        $search = $searchInput;
 
         return compact('declarations', 'search');
     }

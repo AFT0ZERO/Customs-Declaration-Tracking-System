@@ -19,11 +19,7 @@
                             <i class="bi bi-pencil-square"></i> تعديل المحدد
                         </button>
                     </div>
-                    <x-search-tags 
-                        :route="'dashboard'" 
-                        :sort-key="request('sort', 'created_at')" 
-                        :sort-direction="request('direction', 'desc')"
-                    />
+                    @include('partials.search-tags', ['action' => route('dashboard'), 'searchValue' => request('search')])
                 </div>
             </div>
 
