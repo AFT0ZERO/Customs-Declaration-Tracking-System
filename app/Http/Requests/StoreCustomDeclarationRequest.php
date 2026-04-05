@@ -48,7 +48,7 @@ class StoreCustomDeclarationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'declaration_number.required' => 'رقم البيان الجمركي مطلوب.',
+            'declaration_number.required' => 'رقم البيان مطلوب.',
             'declaration_number.unique' => 'هذا البيان الجمركي موجود بالفعل مع نفس النوع والسنة.',
             'declaration_type.required' => 'نوع البيان الجمركي مطلوب.',
             'declaration_type.max' => 'نوع البيان الجمركي يجب ألا يتجاوز 50 حرفاً.',

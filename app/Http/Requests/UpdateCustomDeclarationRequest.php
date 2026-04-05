@@ -55,7 +55,7 @@ class UpdateCustomDeclarationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'editNumber.required' => 'رقم البيان الجمركي مطلوب.',
+            'editNumber.required' => 'رقم البيان مطلوب.',
             'editNumber.unique' => 'هذا البيان الجمركي موجود بالفعل مع نفس النوع والسنة.',
             'declaration_type.required' => 'نوع البيان الجمركي مطلوب.',
             'declaration_type.in' => 'نوع البيان الجمركي يجب أن يكون 220 أو 224 أو 900.',
@@ -65,4 +65,3 @@ class UpdateCustomDeclarationRequest extends FormRequest
         ];
     }
 }
-
