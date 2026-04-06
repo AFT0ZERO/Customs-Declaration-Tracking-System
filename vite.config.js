@@ -8,6 +8,7 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
             ],
+            publicDirectory: 'public_html',
             refresh: true,
         }),
     ],
