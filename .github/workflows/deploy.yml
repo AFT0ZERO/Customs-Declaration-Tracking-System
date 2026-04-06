@@ -28,7 +28,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_HOSTINGER }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd ~/domains/yourdomain.com
+            cd ~/domains/khaki-chamois-235049.hostingersite.com
             git pull origin main
             composer install --no-dev --optimize-autoloader --no-interaction
             php artisan migrate --force
