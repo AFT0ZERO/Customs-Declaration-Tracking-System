@@ -131,6 +131,7 @@
                                                 <option value="220">220</option>
                                                 <option value="224">224</option>
                                                 <option value="900">900</option>
+                                                <option value="220-بوندد">220-بوندد</option>
                                             </select>
                                         </div>
                                     </div>
@@ -170,7 +171,7 @@
                 </div>
             </div>
 
-            <!-- Edit Status Modal -->
+            <!-- Edit Declaration Modal -->
             <div class="modal fade" id="editStatusModal" tabindex="-1" role="dialog" aria-labelledby="editStatusModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -198,6 +199,7 @@
                                                 <option value="220">220</option>
                                                 <option value="224">224</option>
                                                 <option value="900">900</option>
+                                                <option value="220-بوندد">220-بوندد</option>
                                             </select>
                                         </div>
                                     </div>

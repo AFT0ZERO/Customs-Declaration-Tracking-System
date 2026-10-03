@@ -72,6 +72,7 @@
                             '220',
                             '224',
                             '900',
+                            '220-بوندد',
                         ];
                     @endphp
                     <div class="border rounded p-2 bg-white" style="max-height: 140px; overflow-y: auto;">
