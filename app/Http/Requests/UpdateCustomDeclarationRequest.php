@@ -40,7 +40,7 @@ class UpdateCustomDeclarationRequest extends FormRequest
                     ->where('year', $year)
                     ->ignore($declarationId),
             ],
-            'declaration_type' => ['required', 'string', 'max:50', 'in:220,224,900'],
+            'declaration_type' => ['required', 'string', 'max:50', 'in:220,224,900,220-بوندد'],
             'year' => ['required', 'integer', 'in:2025,2026'],
             'status' => ['required', 'string', 'max:255'],
             'editDescription' => ['nullable', 'string'],
@@ -58,7 +58,7 @@ class UpdateCustomDeclarationRequest extends FormRequest
             'editNumber.required' => 'رقم البيان مطلوب.',
             'editNumber.unique' => 'هذا البيان الجمركي موجود بالفعل مع نفس النوع والسنة.',
             'declaration_type.required' => 'نوع البيان الجمركي مطلوب.',
-            'declaration_type.in' => 'نوع البيان الجمركي يجب أن يكون 220 أو 224 أو 900.',
+            'declaration_type.in' => 'نوع البيان الجمركي يجب أن يكون 220 أو 224 أو 900 أو 220-بوندد.',
             'year.required' => 'السنة مطلوبة.',
             'year.in' => 'السنة يجب أن تكون 2025 أو 2026.',
             'status.required' => 'الحالة مطلوبة.',
